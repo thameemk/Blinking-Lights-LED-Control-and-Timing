@@ -1,0 +1,22 @@
+RAM Allocation [bytes]
+Variable                                                                          Address   Size
+------------------------------------------------------------------------------------------------
+
+EEPROM Allocation [bytes]
+Variable                                                                          Address   Size
+------------------------------------------------------------------------------------------------
+
+Register Allocation
+Variable                                                                          Register  Size
+------------------------------------------------------------------------------------------------
+
+FLASH Allocation [words]
+Function                                                                          Address   Size
+------------------------------------------------------------------------------------------------
+main                                                                              0x000CB     20
+system_clocks_init                                                                0x000DF     44
+ports_init                                                                        0x0010B    228
+vports_init                                                                       0x001EF      7
+tc0_disable                                                                       0x001F6      9
+tcc0_init                                                                         0x001FF     95
+tcc0_overflow_isr                                                                 0x0025E      1

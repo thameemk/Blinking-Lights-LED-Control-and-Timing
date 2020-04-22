@@ -1,0 +1,3 @@
+main DSTACK_USAGE:0 DSTACK_LEVEL:0 FILE:"main.c" LINE:39
+tcc0_init DSTACK_USAGE:2 DSTACK_LEVEL:2 FILE:"timers_init.c" LINE:23
+tc0_disable DSTACK_USAGE:4 DSTACK_LEVEL:6 FILE:"timers_init.c" LINE:14
