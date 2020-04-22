@@ -15,4 +15,5 @@ void tc0_disable(TC0_t *ptc);
 // Timer/Counter TCC0 initialization
 void tcc0_init(void);
 
+unit32_t getTime(void);
 #endif

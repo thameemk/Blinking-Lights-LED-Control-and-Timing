@@ -9,6 +9,7 @@ Project :
 
 // I/O Registers definitions
 #include <xmega128b1.h>
+#include <stdint.h>
 
 // Disable a Timer/Counter type TC0
 void tc0_disable(TC0_t *ptc)
@@ -117,10 +118,27 @@ TCC0.CCD=0x0000;
 SREG=s;
 }
 
+static unit32_t msCounter = 0;
 // Timer/Counter TCC0 Overflow/Underflow interrupt service routine
 interrupt [TCC0_OVF_vect] void tcc0_overflow_isr(void)
 {
 // Write your code here
-
+	msCounter++;
 }
 
+unit32_t getTime(void){
+	unsigned char s;
+	unit32_t tempValHolder;
+	
+	// Save interrupts enabled/disabled state
+	s=SREG;
+	// Disable interrupts
+	#asm("cli")
+	
+	//Copy the value with interrupts disabled so the
+	//value isn't corrupted by an untimely interrupt
+	tempValHolder = msCounter;
+	// Restore interrupts enabled/disabled state
+	SREG=s;
+	
+}

@@ -19,6 +19,7 @@ Memory model            : Small
 Data Stack size         : 2048
 *******************************************************/
 
+#include <stdint.h>
 // I/O Registers definitions
 #include <xmega128b1.h>
 
@@ -78,6 +79,13 @@ tcc0_init();
 while (1)
       {
       // Place your code here
-
+			if(getTime() & 0x200)
+			{
+				PORTB.OUT=0xF0;
+			}
+			else
+			{
+				PORTB.OUT=0x00;
+			}
       }
 }

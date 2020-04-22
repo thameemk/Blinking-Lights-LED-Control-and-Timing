@@ -19,6 +19,7 @@
 ;Data Stack size         : 2048
 ;*******************************************************/
 ;
+;#include <stdint.h>
 ;// I/O Registers definitions
 ;#include <xmega128b1.h>
 ;
@@ -33,77 +34,97 @@
 ;
 ;// Timers/Counters initialization functions
 ;#include "timers_init.h"
-;
-;// Declare your global variables here
-;
-;void main(void)
-; 0000 0028 {
 
 	.CSEG
 ;PCODE: $00000000 VOL: 0
-; 0000 0029 // Declare your local variables here
-; 0000 002A unsigned char n;
-; 0000 002B 
-; 0000 002C // Interrupt system initialization
-; 0000 002D // Optimize for speed
-; 0000 002E #pragma optsize-
-; 0000 002F // Make sure the interrupts are disabled
-; 0000 0030 #asm("cli")
-;	n -> R17
 ;PCODE: $00000001 VOL: 0
-; 0000 0031 // Low level interrupt: Off
-; 0000 0032 // Round-robin scheduling for low level interrupt: Off
-; 0000 0033 // Medium level interrupt: Off
-; 0000 0034 // High level interrupt: On
-; 0000 0035 // The interrupt vectors will be placed at the start of the Application FLASH section
-; 0000 0036 n=(PMIC.CTRL & (~(PMIC_RREN_bm | PMIC_IVSEL_bm | PMIC_HILVLEN_bm | PMIC_MEDLVLEN_bm | PMIC_LOLVLEN_bm))) |
-; 0000 0037 	PMIC_HILVLEN_bm;
-;PCODE: $00000002 VOL: 1
+;PCODE: $00000002 VOL: 0
 ;PCODE: $00000003 VOL: 0
+; 0000 0025 
+; 0000 0026 // Declare your global variables here
+; 0000 0027 
+; 0000 0028 void main(void)
+; 0000 0029 {
 ;PCODE: $00000004 VOL: 0
+; 0000 002A // Declare your local variables here
+; 0000 002B unsigned char n;
+; 0000 002C 
+; 0000 002D // Interrupt system initialization
+; 0000 002E // Optimize for speed
+; 0000 002F #pragma optsize-
+; 0000 0030 // Make sure the interrupts are disabled
+; 0000 0031 #asm("cli")
+;	n -> R17
 ;PCODE: $00000005 VOL: 0
-; 0000 0038 CCP=CCP_IOREG_gc;
-;PCODE: $00000006 VOL: 0
+; 0000 0032 // Low level interrupt: Off
+; 0000 0033 // Round-robin scheduling for low level interrupt: Off
+; 0000 0034 // Medium level interrupt: Off
+; 0000 0035 // High level interrupt: On
+; 0000 0036 // The interrupt vectors will be placed at the start of the Application FLASH section
+; 0000 0037 n=(PMIC.CTRL & (~(PMIC_RREN_bm | PMIC_IVSEL_bm | PMIC_HILVLEN_bm | PMIC_MEDLVLEN_bm | PMIC_LOLVLEN_bm))) |
+; 0000 0038 	PMIC_HILVLEN_bm;
+;PCODE: $00000006 VOL: 1
 ;PCODE: $00000007 VOL: 0
-; 0000 0039 PMIC.CTRL=n;
-;PCODE: $00000008 VOL: 1
+;PCODE: $00000008 VOL: 0
 ;PCODE: $00000009 VOL: 0
-; 0000 003A // Set the default priority for round-robin scheduling
-; 0000 003B PMIC.INTPRI=0x00;
+; 0000 0039 CCP=CCP_IOREG_gc;
 ;PCODE: $0000000A VOL: 0
-;PCODE: $0000000B VOL: 1
-; 0000 003C // Restore optimization for size if needed
-; 0000 003D #pragma optsize_default
-; 0000 003E 
-; 0000 003F // System clocks initialization
-; 0000 0040 system_clocks_init();
-;PCODE: $0000000C VOL: 0
-; 0000 0041 
-; 0000 0042 // Ports initialization
-; 0000 0043 ports_init();
+;PCODE: $0000000B VOL: 0
+; 0000 003A PMIC.CTRL=n;
+;PCODE: $0000000C VOL: 1
 ;PCODE: $0000000D VOL: 0
-; 0000 0044 
-; 0000 0045 // Virtual Ports initialization
-; 0000 0046 vports_init();
+; 0000 003B // Set the default priority for round-robin scheduling
+; 0000 003C PMIC.INTPRI=0x00;
 ;PCODE: $0000000E VOL: 0
-; 0000 0047 
-; 0000 0048 // Timer/Counter TCC0 initialization
-; 0000 0049 tcc0_init();
-;PCODE: $0000000F VOL: 0
-; 0000 004A 
-; 0000 004B // Globally enable interrupts
-; 0000 004C #asm("sei")
+;PCODE: $0000000F VOL: 1
+; 0000 003D // Restore optimization for size if needed
+; 0000 003E #pragma optsize_default
+; 0000 003F 
+; 0000 0040 // System clocks initialization
+; 0000 0041 system_clocks_init();
 ;PCODE: $00000010 VOL: 0
-; 0000 004D 
-; 0000 004E while (1)
+; 0000 0042 
+; 0000 0043 // Ports initialization
+; 0000 0044 ports_init();
 ;PCODE: $00000011 VOL: 0
-; 0000 004F       {
-; 0000 0050       // Place your code here
-; 0000 0051 
-; 0000 0052       }
+; 0000 0045 
+; 0000 0046 // Virtual Ports initialization
+; 0000 0047 vports_init();
 ;PCODE: $00000012 VOL: 0
+; 0000 0048 
+; 0000 0049 // Timer/Counter TCC0 initialization
+; 0000 004A tcc0_init();
 ;PCODE: $00000013 VOL: 0
-; 0000 0053 }
+; 0000 004B 
+; 0000 004C // Globally enable interrupts
+; 0000 004D #asm("sei")
 ;PCODE: $00000014 VOL: 0
+; 0000 004E 
+; 0000 004F while (1)
 ;PCODE: $00000015 VOL: 0
+; 0000 0050       {
+; 0000 0051       // Place your code here
+; 0000 0052 			if(getTime() & 0x200)
 ;PCODE: $00000016 VOL: 0
+;PCODE: $00000017 VOL: 0
+;PCODE: $00000018 VOL: 0
+;PCODE: $00000019 VOL: 0
+; 0000 0053 			{
+;PCODE: $0000001A VOL: 0
+; 0000 0054 				PORTB.OUT=0xF0;
+;PCODE: $0000001B VOL: 0
+;PCODE: $0000001C VOL: 1
+; 0000 0055 			}
+; 0000 0056 			else
+; 0000 0057 			{
+; 0000 0058 				PORTB.OUT=0x00;
+;PCODE: $0000001D VOL: 0
+;PCODE: $0000001E VOL: 1
+; 0000 0059 			}
+; 0000 005A       }
+;PCODE: $0000001F VOL: 0
+;PCODE: $00000020 VOL: 0
+; 0000 005B }
+;PCODE: $00000021 VOL: 0
+;PCODE: $00000022 VOL: 0
+;PCODE: $00000023 VOL: 0
