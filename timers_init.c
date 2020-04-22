@@ -118,7 +118,7 @@ TCC0.CCD=0x0000;
 SREG=s;
 }
 
-static unit32_t msCounter = 0;
+static uint32_t msCounter = 0;
 // Timer/Counter TCC0 Overflow/Underflow interrupt service routine
 interrupt [TCC0_OVF_vect] void tcc0_overflow_isr(void)
 {
@@ -126,9 +126,9 @@ interrupt [TCC0_OVF_vect] void tcc0_overflow_isr(void)
 	msCounter++;
 }
 
-unit32_t getTime(void){
+uint32_t getTime(void){
 	unsigned char s;
-	unit32_t tempValHolder;
+	uint32_t tempValHolder;
 	
 	// Save interrupts enabled/disabled state
 	s=SREG;

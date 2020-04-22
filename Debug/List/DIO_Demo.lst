@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.1.30  C:\Users\thame\Documents\Atmel Studio\7.0\Blinking-Lights-LED-Control-and-Timing\Debug\List\DIO_Demo.asm Wed Apr 22 20:38:50 2020
+AVRASM ver. 2.1.30  C:\Users\thame\Documents\Atmel Studio\7.0\Blinking-Lights-LED-Control-and-Timing\Debug\List\DIO_Demo.asm Wed Apr 22 22:00:33 2020
 
                  
                  
@@ -1141,7 +1141,7 @@ AVRASM ver. 2.1.30  C:\Users\thame\Documents\Atmel Studio\7.0\Blinking-Lights-LE
 000016 940c 0000 	JMP  0x00
 000018 940c 0000 	JMP  0x00
 00001a 940c 0000 	JMP  0x00
-00001c 940c 025e 	JMP  _tcc0_overflow_isr
+00001c 940c 0266 	JMP  _tcc0_overflow_isr
 00001e 940c 0000 	JMP  0x00
 000020 940c 0000 	JMP  0x00
 000022 940c 0000 	JMP  0x00
@@ -1298,6 +1298,7 @@ AVRASM ver. 2.1.30  C:\Users\thame\Documents\Atmel Studio\7.0\Blinking-Lights-LE
                  ;Data Stack size         : 2048
                  ;*******************************************************/
                  ;
+                 ;#include <stdint.h>
                  ;// I/O Registers definitions
                  ;#include <xmega128b1.h>
                  ;
@@ -1316,74 +1317,90 @@ AVRASM ver. 2.1.30  C:\Users\thame\Documents\Atmel Studio\7.0\Blinking-Lights-LE
                  ;// Declare your global variables here
                  ;
                  ;void main(void)
-                 ; 0000 0028 {
+                 ; 0000 0029 {
                  
                  	.CSEG
                  _main:
                  ; .FSTART _main
-                 ; 0000 0029 // Declare your local variables here
-                 ; 0000 002A unsigned char n;
-                 ; 0000 002B 
-                 ; 0000 002C // Interrupt system initialization
-                 ; 0000 002D // Optimize for speed
-                 ; 0000 002E #pragma optsize-
-                 ; 0000 002F // Make sure the interrupts are disabled
-                 ; 0000 0030 #asm("cli")
+                 ; 0000 002A // Declare your local variables here
+                 ; 0000 002B unsigned char n;
+                 ; 0000 002C 
+                 ; 0000 002D // Interrupt system initialization
+                 ; 0000 002E // Optimize for speed
+                 ; 0000 002F #pragma optsize-
+                 ; 0000 0030 // Make sure the interrupts are disabled
+                 ; 0000 0031 #asm("cli")
                  ;	n -> R17
 0000cb 94f8      	CLI
-                 ; 0000 0031 // Low level interrupt: Off
-                 ; 0000 0032 // Round-robin scheduling for low level interrupt: Off
-                 ; 0000 0033 // Medium level interrupt: Off
-                 ; 0000 0034 // High level interrupt: On
-                 ; 0000 0035 // The interrupt vectors will be placed at the start of the Application FLASH section
-                 ; 0000 0036 n=(PMIC.CTRL & (~(PMIC_RREN_bm | PMIC_IVSEL_bm | PMIC_HILVLEN_bm | PMIC_MEDLVLEN_bm | PMIC_LOLVLEN_bm))) |
-                 ; 0000 0037 	PMIC_HILVLEN_bm;
+                 ; 0000 0032 // Low level interrupt: Off
+                 ; 0000 0033 // Round-robin scheduling for low level interrupt: Off
+                 ; 0000 0034 // Medium level interrupt: Off
+                 ; 0000 0035 // High level interrupt: On
+                 ; 0000 0036 // The interrupt vectors will be placed at the start of the Application FLASH section
+                 ; 0000 0037 n=(PMIC.CTRL & (~(PMIC_RREN_bm | PMIC_IVSEL_bm | PMIC_HILVLEN_bm | PMIC_MEDLVLEN_bm | PMIC_LOLVLEN_bm))) |
+                 ; 0000 0038 	PMIC_HILVLEN_bm;
 0000cc 91e0 00a2 	LDS  R30,162
 0000ce 73e8      	ANDI R30,LOW(0x38)
 0000cf 60e4      	ORI  R30,4
 0000d0 2f1e      	MOV  R17,R30
-                 ; 0000 0038 CCP=CCP_IOREG_gc;
+                 ; 0000 0039 CCP=CCP_IOREG_gc;
 0000d1 ede8      	LDI  R30,LOW(216)
 0000d2 bfe4      	OUT  0x34,R30
-                 ; 0000 0039 PMIC.CTRL=n;
+                 ; 0000 003A PMIC.CTRL=n;
 0000d3 9310 00a2 	STS  162,R17
-                 ; 0000 003A // Set the default priority for round-robin scheduling
-                 ; 0000 003B PMIC.INTPRI=0x00;
+                 ; 0000 003B // Set the default priority for round-robin scheduling
+                 ; 0000 003C PMIC.INTPRI=0x00;
 0000d5 e0e0      	LDI  R30,LOW(0)
 0000d6 93e0 00a1 	STS  161,R30
-                 ; 0000 003C // Restore optimization for size if needed
-                 ; 0000 003D #pragma optsize_default
-                 ; 0000 003E 
-                 ; 0000 003F // System clocks initialization
-                 ; 0000 0040 system_clocks_init();
-0000d8 d006      	RCALL _system_clocks_init
-                 ; 0000 0041 
-                 ; 0000 0042 // Ports initialization
-                 ; 0000 0043 ports_init();
-0000d9 d031      	RCALL _ports_init
-                 ; 0000 0044 
-                 ; 0000 0045 // Virtual Ports initialization
-                 ; 0000 0046 vports_init();
-0000da d114      	RCALL _vports_init
-                 ; 0000 0047 
-                 ; 0000 0048 // Timer/Counter TCC0 initialization
-                 ; 0000 0049 tcc0_init();
-0000db d123      	RCALL _tcc0_init
-                 ; 0000 004A 
-                 ; 0000 004B // Globally enable interrupts
-                 ; 0000 004C #asm("sei")
+                 ; 0000 003D // Restore optimization for size if needed
+                 ; 0000 003E #pragma optsize_default
+                 ; 0000 003F 
+                 ; 0000 0040 // System clocks initialization
+                 ; 0000 0041 system_clocks_init();
+0000d8 d00e      	RCALL _system_clocks_init
+                 ; 0000 0042 
+                 ; 0000 0043 // Ports initialization
+                 ; 0000 0044 ports_init();
+0000d9 d039      	RCALL _ports_init
+                 ; 0000 0045 
+                 ; 0000 0046 // Virtual Ports initialization
+                 ; 0000 0047 vports_init();
+0000da d11c      	RCALL _vports_init
+                 ; 0000 0048 
+                 ; 0000 0049 // Timer/Counter TCC0 initialization
+                 ; 0000 004A tcc0_init();
+0000db d12b      	RCALL _tcc0_init
+                 ; 0000 004B 
+                 ; 0000 004C // Globally enable interrupts
+                 ; 0000 004D #asm("sei")
 0000dc 9478      	SEI
-                 ; 0000 004D 
-                 ; 0000 004E while (1)
+                 ; 0000 004E 
+                 ; 0000 004F while (1)
                  _0x3:
-                 ; 0000 004F       {
-                 ; 0000 0050       // Place your code here
-                 ; 0000 0051 
-                 ; 0000 0052       }
-0000dd cfff      	RJMP _0x3
-                 ; 0000 0053 }
+                 ; 0000 0050       {
+                 ; 0000 0051       // Place your code here
+                 ; 0000 0052 			if(getTime() & 0x200)
+0000dd d1a1      	RCALL _getTime
+0000de 70f2      	ANDI R31,HIGH(0x200)
+0000df f011      	BREQ _0x6
+                 ; 0000 0053 			{
+                 ; 0000 0054 				PORTB.OUT=0xF0;
+0000e0 efe0      	LDI  R30,LOW(240)
+0000e1 c001      	RJMP _0x9
+                 ; 0000 0055 			}
+                 ; 0000 0056 			else
                  _0x6:
-0000de cfff      	RJMP _0x6
+                 ; 0000 0057 			{
+                 ; 0000 0058 				PORTB.OUT=0x00;
+0000e2 e0e0      	LDI  R30,LOW(0)
+                 _0x9:
+0000e3 93e0 0624 	STS  1572,R30
+                 ; 0000 0059 			}
+                 ; 0000 005A       }
+0000e5 cff7      	RJMP _0x3
+                 ; 0000 005B }
+                 _0x8:
+0000e6 cfff      	RJMP _0x8
                  ; .FEND
                  ;/*******************************************************
                  ;System clock initialization created by the
@@ -1413,32 +1430,32 @@ AVRASM ver. 2.1.30  C:\Users\thame\Documents\Atmel Studio\7.0\Blinking-Lights-LE
                  ; 0001 0016 #pragma optsize-
                  ; 0001 0017 // Save interrupts enabled/disabled state
                  ; 0001 0018 s=SREG;
-0000df 931a      	ST   -Y,R17
-0000e0 930a      	ST   -Y,R16
+0000e7 931a      	ST   -Y,R17
+0000e8 930a      	ST   -Y,R16
                  ;	n -> R17
                  ;	s -> R16
-0000e1 b70f      	IN   R16,63
+0000e9 b70f      	IN   R16,63
                  ; 0001 0019 // Disable interrupts
                  ; 0001 001A #asm("cli")
-0000e2 94f8      	CLI
+0000ea 94f8      	CLI
                  ; 0001 001B 
                  ; 0001 001C // Internal 2 MHz RC oscillator initialization
                  ; 0001 001D // Enable the internal 2 MHz RC oscillator
                  ; 0001 001E OSC.CTRL|=OSC_RC2MEN_bm;
-0000e3 91e0 0050 	LDS  R30,80
-0000e5 60e1      	ORI  R30,1
-0000e6 93e0 0050 	STS  80,R30
+0000eb 91e0 0050 	LDS  R30,80
+0000ed 60e1      	ORI  R30,1
+0000ee 93e0 0050 	STS  80,R30
                  ; 0001 001F // Wait for the internal 2 MHz RC oscillator to stabilize
                  ; 0001 0020 while ((OSC.STATUS & OSC_RC2MRDY_bm)==0);
                  _0x20003:
-0000e8 91e0 0051 	LDS  R30,81
-0000ea 70e1      	ANDI R30,LOW(0x1)
-0000eb f3e1      	BREQ _0x20003
+0000f0 91e0 0051 	LDS  R30,81
+0000f2 70e1      	ANDI R30,LOW(0x1)
+0000f3 f3e1      	BREQ _0x20003
                  ; 0001 0021 
                  ; 0001 0022 // Disable the auto-calibration of the internal 2 MHz RC oscillator
                  ; 0001 0023 DFLLRC2M.CTRL=0<<DFLL_ENABLE_bp;
-0000ec e0e0      	LDI  R30,LOW(0)
-0000ed 93e0 0068 	STS  104,R30
+0000f4 e0e0      	LDI  R30,LOW(0)
+0000f5 93e0 0068 	STS  104,R30
                  ; 0001 0024 
                  ; 0001 0025 // System Clock prescaler A division factor: 1
                  ; 0001 0026 // System Clock prescalers B & C division factors: B:1, C:1
@@ -1448,44 +1465,44 @@ AVRASM ver. 2.1.30  C:\Users\thame\Documents\Atmel Studio\7.0\Blinking-Lights-LE
                  ; 0001 002A // ClkCPU:  2000.000 kHz
                  ; 0001 002B n=(CLK.PSCTRL & (~(CLK_PSADIV_gm | CLK_PSBCDIV1_bm | CLK_PSBCDIV0_bm))) |
                  ; 0001 002C 	CLK_PSADIV_1_gc | CLK_PSBCDIV_1_1_gc;
-0000ef 91e0 0041 	LDS  R30,65
-0000f1 78e0      	ANDI R30,LOW(0x80)
-0000f2 2f1e      	MOV  R17,R30
+0000f7 91e0 0041 	LDS  R30,65
+0000f9 78e0      	ANDI R30,LOW(0x80)
+0000fa 2f1e      	MOV  R17,R30
                  ; 0001 002D CCP=CCP_IOREG_gc;
-0000f3 ede8      	LDI  R30,LOW(216)
-0000f4 bfe4      	OUT  0x34,R30
+0000fb ede8      	LDI  R30,LOW(216)
+0000fc bfe4      	OUT  0x34,R30
                  ; 0001 002E CLK.PSCTRL=n;
-0000f5 9310 0041 	STS  65,R17
+0000fd 9310 0041 	STS  65,R17
                  ; 0001 002F 
                  ; 0001 0030 // Select the system clock source: 2 MHz Internal RC Osc.
                  ; 0001 0031 n=(CLK.CTRL & (~CLK_SCLKSEL_gm)) | CLK_SCLKSEL_RC2M_gc;
-0000f7 91e0 0040 	LDS  R30,64
-0000f9 7fe8      	ANDI R30,LOW(0xF8)
-0000fa 2f1e      	MOV  R17,R30
+0000ff 91e0 0040 	LDS  R30,64
+000101 7fe8      	ANDI R30,LOW(0xF8)
+000102 2f1e      	MOV  R17,R30
                  ; 0001 0032 CCP=CCP_IOREG_gc;
-0000fb ede8      	LDI  R30,LOW(216)
-0000fc bfe4      	OUT  0x34,R30
+000103 ede8      	LDI  R30,LOW(216)
+000104 bfe4      	OUT  0x34,R30
                  ; 0001 0033 CLK.CTRL=n;
-0000fd 9310 0040 	STS  64,R17
+000105 9310 0040 	STS  64,R17
                  ; 0001 0034 
                  ; 0001 0035 // Disable the unused oscillators: 32 kHz, 32 MHz, external clock/crystal oscillator, PLL
                  ; 0001 0036 OSC.CTRL&= ~(OSC_RC32KEN_bm | OSC_RC32MEN_bm | OSC_XOSCEN_bm | OSC_PLLEN_bm);
-0000ff 91e0 0050 	LDS  R30,80
-000101 7ee1      	ANDI R30,LOW(0xE1)
-000102 93e0 0050 	STS  80,R30
+000107 91e0 0050 	LDS  R30,80
+000109 7ee1      	ANDI R30,LOW(0xE1)
+00010a 93e0 0050 	STS  80,R30
                  ; 0001 0037 
                  ; 0001 0038 // ClkPer output disabled
                  ; 0001 0039 PORTCFG.CLKEVOUT&= ~(PORTCFG_CLKOUTSEL_gm | PORTCFG_CLKOUT_gm);
-000104 91e0 00b4 	LDS  R30,180
-000106 7fe0      	ANDI R30,LOW(0xF0)
-000107 93e0 00b4 	STS  180,R30
+00010c 91e0 00b4 	LDS  R30,180
+00010e 7fe0      	ANDI R30,LOW(0xF0)
+00010f 93e0 00b4 	STS  180,R30
                  ; 0001 003A // Restore interrupts enabled/disabled state
                  ; 0001 003B SREG=s;
-000109 bf0f      	OUT  0x3F,R16
+000111 bf0f      	OUT  0x3F,R16
                  ; 0001 003C // Restore optimization for size if needed
                  ; 0001 003D #pragma optsize_default
                  ; 0001 003E }
-00010a c150      	RJMP _0x2060001
+000112 c150      	RJMP _0x2060001
                  ; .FEND
                  ;
                  ;/*******************************************************
@@ -1510,8 +1527,8 @@ AVRASM ver. 2.1.30  C:\Users\thame\Documents\Atmel Studio\7.0\Blinking-Lights-LE
                  ; 0002 0010 // PORTA initialization
                  ; 0002 0011 // OUT register
                  ; 0002 0012 PORTA.OUT=0x00;
-00010b e0e0      	LDI  R30,LOW(0)
-00010c 93e0 0604 	STS  1540,R30
+000113 e0e0      	LDI  R30,LOW(0)
+000114 93e0 0604 	STS  1540,R30
                  ; 0002 0013 // Pin0: Input
                  ; 0002 0014 // Pin1: Input
                  ; 0002 0015 // Pin2: Input
@@ -1521,54 +1538,54 @@ AVRASM ver. 2.1.30  C:\Users\thame\Documents\Atmel Studio\7.0\Blinking-Lights-LE
                  ; 0002 0019 // Pin6: Input
                  ; 0002 001A // Pin7: Input
                  ; 0002 001B PORTA.DIR=0x00;
-00010e 93e0 0600 	STS  1536,R30
+000116 93e0 0600 	STS  1536,R30
                  ; 0002 001C // Pin0 Output/Pull configuration: Totempole/No
                  ; 0002 001D // Pin0 Input/Sense configuration: Sense both edges
                  ; 0002 001E // Pin0 Inverted: Off
                  ; 0002 001F PORTA.PIN0CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-000110 93e0 0610 	STS  1552,R30
+000118 93e0 0610 	STS  1552,R30
                  ; 0002 0020 // Pin1 Output/Pull configuration: Totempole/No
                  ; 0002 0021 // Pin1 Input/Sense configuration: Sense both edges
                  ; 0002 0022 // Pin1 Inverted: Off
                  ; 0002 0023 PORTA.PIN1CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-000112 93e0 0611 	STS  1553,R30
+00011a 93e0 0611 	STS  1553,R30
                  ; 0002 0024 // Pin2 Output/Pull configuration: Totempole/No
                  ; 0002 0025 // Pin2 Input/Sense configuration: Sense both edges
                  ; 0002 0026 // Pin2 Inverted: Off
                  ; 0002 0027 PORTA.PIN2CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-000114 93e0 0612 	STS  1554,R30
+00011c 93e0 0612 	STS  1554,R30
                  ; 0002 0028 // Pin3 Output/Pull configuration: Totempole/No
                  ; 0002 0029 // Pin3 Input/Sense configuration: Sense both edges
                  ; 0002 002A // Pin3 Inverted: Off
                  ; 0002 002B PORTA.PIN3CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-000116 93e0 0613 	STS  1555,R30
+00011e 93e0 0613 	STS  1555,R30
                  ; 0002 002C // Pin4 Output/Pull configuration: Totempole/No
                  ; 0002 002D // Pin4 Input/Sense configuration: Sense both edges
                  ; 0002 002E // Pin4 Inverted: Off
                  ; 0002 002F PORTA.PIN4CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-000118 93e0 0614 	STS  1556,R30
+000120 93e0 0614 	STS  1556,R30
                  ; 0002 0030 // Pin5 Output/Pull configuration: Totempole/No
                  ; 0002 0031 // Pin5 Input/Sense configuration: Sense both edges
                  ; 0002 0032 // Pin5 Inverted: Off
                  ; 0002 0033 PORTA.PIN5CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-00011a 93e0 0615 	STS  1557,R30
+000122 93e0 0615 	STS  1557,R30
                  ; 0002 0034 // Pin6 Output/Pull configuration: Totempole/No
                  ; 0002 0035 // Pin6 Input/Sense configuration: Sense both edges
                  ; 0002 0036 // Pin6 Inverted: Off
                  ; 0002 0037 PORTA.PIN6CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-00011c 93e0 0616 	STS  1558,R30
+000124 93e0 0616 	STS  1558,R30
                  ; 0002 0038 // Pin7 Output/Pull configuration: Totempole/No
                  ; 0002 0039 // Pin7 Input/Sense configuration: Sense both edges
                  ; 0002 003A // Pin7 Inverted: Off
                  ; 0002 003B PORTA.PIN7CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-00011e 93e0 0617 	STS  1559,R30
+000126 93e0 0617 	STS  1559,R30
                  ; 0002 003C // Interrupt 0 level: Disabled
                  ; 0002 003D // Interrupt 1 level: Disabled
                  ; 0002 003E PORTA.INTCTRL=(PORTA.INTCTRL & (~(PORT_INT1LVL_gm | PORT_INT0LVL_gm))) |
                  ; 0002 003F 	PORT_INT1LVL_OFF_gc | PORT_INT0LVL_OFF_gc;
-000120 91e0 0609 	LDS  R30,1545
-000122 7fe0      	ANDI R30,LOW(0xF0)
-000123 93e0 0609 	STS  1545,R30
+000128 91e0 0609 	LDS  R30,1545
+00012a 7fe0      	ANDI R30,LOW(0xF0)
+00012b 93e0 0609 	STS  1545,R30
                  ; 0002 0040 // Pin0 Pin Change interrupt 0: Off
                  ; 0002 0041 // Pin1 Pin Change interrupt 0: Off
                  ; 0002 0042 // Pin2 Pin Change interrupt 0: Off
@@ -1578,8 +1595,8 @@ AVRASM ver. 2.1.30  C:\Users\thame\Documents\Atmel Studio\7.0\Blinking-Lights-LE
                  ; 0002 0046 // Pin6 Pin Change interrupt 0: Off
                  ; 0002 0047 // Pin7 Pin Change interrupt 0: Off
                  ; 0002 0048 PORTA.INT0MASK=0x00;
-000125 e0e0      	LDI  R30,LOW(0)
-000126 93e0 060a 	STS  1546,R30
+00012d e0e0      	LDI  R30,LOW(0)
+00012e 93e0 060a 	STS  1546,R30
                  ; 0002 0049 // Pin0 Pin Change interrupt 1: Off
                  ; 0002 004A // Pin1 Pin Change interrupt 1: Off
                  ; 0002 004B // Pin2 Pin Change interrupt 1: Off
@@ -1589,13 +1606,13 @@ AVRASM ver. 2.1.30  C:\Users\thame\Documents\Atmel Studio\7.0\Blinking-Lights-LE
                  ; 0002 004F // Pin6 Pin Change interrupt 1: Off
                  ; 0002 0050 // Pin7 Pin Change interrupt 1: Off
                  ; 0002 0051 PORTA.INT1MASK=0x00;
-000128 93e0 060b 	STS  1547,R30
+000130 93e0 060b 	STS  1547,R30
                  ; 0002 0052 
                  ; 0002 0053 // PORTB initialization
                  ; 0002 0054 // OUT register
                  ; 0002 0055 PORTB.OUT=0xF0;
-00012a efe0      	LDI  R30,LOW(240)
-00012b 93e0 0624 	STS  1572,R30
+000132 efe0      	LDI  R30,LOW(240)
+000133 93e0 0624 	STS  1572,R30
                  ; 0002 0056 // Pin0: Input
                  ; 0002 0057 // Pin1: Input
                  ; 0002 0058 // Pin2: Input
@@ -1605,55 +1622,55 @@ AVRASM ver. 2.1.30  C:\Users\thame\Documents\Atmel Studio\7.0\Blinking-Lights-LE
                  ; 0002 005C // Pin6: Output
                  ; 0002 005D // Pin7: Output
                  ; 0002 005E PORTB.DIR=0xF0;
-00012d 93e0 0620 	STS  1568,R30
+000135 93e0 0620 	STS  1568,R30
                  ; 0002 005F // Pin0 Output/Pull configuration: Totempole/No
                  ; 0002 0060 // Pin0 Input/Sense configuration: Sense both edges
                  ; 0002 0061 // Pin0 Inverted: Off
                  ; 0002 0062 PORTB.PIN0CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-00012f e0e0      	LDI  R30,LOW(0)
-000130 93e0 0630 	STS  1584,R30
+000137 e0e0      	LDI  R30,LOW(0)
+000138 93e0 0630 	STS  1584,R30
                  ; 0002 0063 // Pin1 Output/Pull configuration: Totempole/No
                  ; 0002 0064 // Pin1 Input/Sense configuration: Sense both edges
                  ; 0002 0065 // Pin1 Inverted: Off
                  ; 0002 0066 PORTB.PIN1CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-000132 93e0 0631 	STS  1585,R30
+00013a 93e0 0631 	STS  1585,R30
                  ; 0002 0067 // Pin2 Output/Pull configuration: Totempole/No
                  ; 0002 0068 // Pin2 Input/Sense configuration: Sense both edges
                  ; 0002 0069 // Pin2 Inverted: Off
                  ; 0002 006A PORTB.PIN2CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-000134 93e0 0632 	STS  1586,R30
+00013c 93e0 0632 	STS  1586,R30
                  ; 0002 006B // Pin3 Output/Pull configuration: Totempole/No
                  ; 0002 006C // Pin3 Input/Sense configuration: Sense both edges
                  ; 0002 006D // Pin3 Inverted: Off
                  ; 0002 006E PORTB.PIN3CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-000136 93e0 0633 	STS  1587,R30
+00013e 93e0 0633 	STS  1587,R30
                  ; 0002 006F // Pin4 Output/Pull configuration: Totempole/No
                  ; 0002 0070 // Pin4 Input/Sense configuration: Sense both edges
                  ; 0002 0071 // Pin4 Inverted: Off
                  ; 0002 0072 PORTB.PIN4CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-000138 93e0 0634 	STS  1588,R30
+000140 93e0 0634 	STS  1588,R30
                  ; 0002 0073 // Pin5 Output/Pull configuration: Totempole/No
                  ; 0002 0074 // Pin5 Input/Sense configuration: Sense both edges
                  ; 0002 0075 // Pin5 Inverted: Off
                  ; 0002 0076 PORTB.PIN5CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-00013a 93e0 0635 	STS  1589,R30
+000142 93e0 0635 	STS  1589,R30
                  ; 0002 0077 // Pin6 Output/Pull configuration: Totempole/No
                  ; 0002 0078 // Pin6 Input/Sense configuration: Sense both edges
                  ; 0002 0079 // Pin6 Inverted: Off
                  ; 0002 007A PORTB.PIN6CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-00013c 93e0 0636 	STS  1590,R30
+000144 93e0 0636 	STS  1590,R30
                  ; 0002 007B // Pin7 Output/Pull configuration: Totempole/No
                  ; 0002 007C // Pin7 Input/Sense configuration: Sense both edges
                  ; 0002 007D // Pin7 Inverted: Off
                  ; 0002 007E PORTB.PIN7CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-00013e 93e0 0637 	STS  1591,R30
+000146 93e0 0637 	STS  1591,R30
                  ; 0002 007F // Interrupt 0 level: Disabled
                  ; 0002 0080 // Interrupt 1 level: Disabled
                  ; 0002 0081 PORTB.INTCTRL=(PORTB.INTCTRL & (~(PORT_INT1LVL_gm | PORT_INT0LVL_gm))) |
                  ; 0002 0082 	PORT_INT1LVL_OFF_gc | PORT_INT0LVL_OFF_gc;
-000140 91e0 0629 	LDS  R30,1577
-000142 7fe0      	ANDI R30,LOW(0xF0)
-000143 93e0 0629 	STS  1577,R30
+000148 91e0 0629 	LDS  R30,1577
+00014a 7fe0      	ANDI R30,LOW(0xF0)
+00014b 93e0 0629 	STS  1577,R30
                  ; 0002 0083 // Pin0 Pin Change interrupt 0: Off
                  ; 0002 0084 // Pin1 Pin Change interrupt 0: Off
                  ; 0002 0085 // Pin2 Pin Change interrupt 0: Off
@@ -1663,8 +1680,8 @@ AVRASM ver. 2.1.30  C:\Users\thame\Documents\Atmel Studio\7.0\Blinking-Lights-LE
                  ; 0002 0089 // Pin6 Pin Change interrupt 0: Off
                  ; 0002 008A // Pin7 Pin Change interrupt 0: Off
                  ; 0002 008B PORTB.INT0MASK=0x00;
-000145 e0e0      	LDI  R30,LOW(0)
-000146 93e0 062a 	STS  1578,R30
+00014d e0e0      	LDI  R30,LOW(0)
+00014e 93e0 062a 	STS  1578,R30
                  ; 0002 008C // Pin0 Pin Change interrupt 1: Off
                  ; 0002 008D // Pin1 Pin Change interrupt 1: Off
                  ; 0002 008E // Pin2 Pin Change interrupt 1: Off
@@ -1674,12 +1691,12 @@ AVRASM ver. 2.1.30  C:\Users\thame\Documents\Atmel Studio\7.0\Blinking-Lights-LE
                  ; 0002 0092 // Pin6 Pin Change interrupt 1: Off
                  ; 0002 0093 // Pin7 Pin Change interrupt 1: Off
                  ; 0002 0094 PORTB.INT1MASK=0x00;
-000148 93e0 062b 	STS  1579,R30
+000150 93e0 062b 	STS  1579,R30
                  ; 0002 0095 
                  ; 0002 0096 // PORTC initialization
                  ; 0002 0097 // OUT register
                  ; 0002 0098 PORTC.OUT=0x00;
-00014a 93e0 0644 	STS  1604,R30
+000152 93e0 0644 	STS  1604,R30
                  ; 0002 0099 // Pin0: Input
                  ; 0002 009A // Pin1: Input
                  ; 0002 009B // Pin2: Input
@@ -1689,47 +1706,47 @@ AVRASM ver. 2.1.30  C:\Users\thame\Documents\Atmel Studio\7.0\Blinking-Lights-LE
                  ; 0002 009F // Pin6: Input
                  ; 0002 00A0 // Pin7: Input
                  ; 0002 00A1 PORTC.DIR=0x00;
-00014c 93e0 0640 	STS  1600,R30
+000154 93e0 0640 	STS  1600,R30
                  ; 0002 00A2 // Pin0 Output/Pull configuration: Totempole/No
                  ; 0002 00A3 // Pin0 Input/Sense configuration: Sense both edges
                  ; 0002 00A4 // Pin0 Inverted: Off
                  ; 0002 00A5 PORTC.PIN0CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-00014e 93e0 0650 	STS  1616,R30
+000156 93e0 0650 	STS  1616,R30
                  ; 0002 00A6 // Pin1 Output/Pull configuration: Totempole/No
                  ; 0002 00A7 // Pin1 Input/Sense configuration: Sense both edges
                  ; 0002 00A8 // Pin1 Inverted: Off
                  ; 0002 00A9 PORTC.PIN1CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-000150 93e0 0651 	STS  1617,R30
+000158 93e0 0651 	STS  1617,R30
                  ; 0002 00AA // Pin2 Output/Pull configuration: Totempole/No
                  ; 0002 00AB // Pin2 Input/Sense configuration: Sense both edges
                  ; 0002 00AC // Pin2 Inverted: Off
                  ; 0002 00AD PORTC.PIN2CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-000152 93e0 0652 	STS  1618,R30
+00015a 93e0 0652 	STS  1618,R30
                  ; 0002 00AE // Pin3 Output/Pull configuration: Totempole/No
                  ; 0002 00AF // Pin3 Input/Sense configuration: Sense both edges
                  ; 0002 00B0 // Pin3 Inverted: Off
                  ; 0002 00B1 PORTC.PIN3CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-000154 93e0 0653 	STS  1619,R30
+00015c 93e0 0653 	STS  1619,R30
                  ; 0002 00B2 // Pin4 Output/Pull configuration: Totempole/No
                  ; 0002 00B3 // Pin4 Input/Sense configuration: Sense both edges
                  ; 0002 00B4 // Pin4 Inverted: Off
                  ; 0002 00B5 PORTC.PIN4CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-000156 93e0 0654 	STS  1620,R30
+00015e 93e0 0654 	STS  1620,R30
                  ; 0002 00B6 // Pin5 Output/Pull configuration: Totempole/No
                  ; 0002 00B7 // Pin5 Input/Sense configuration: Sense both edges
                  ; 0002 00B8 // Pin5 Inverted: Off
                  ; 0002 00B9 PORTC.PIN5CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-000158 93e0 0655 	STS  1621,R30
+000160 93e0 0655 	STS  1621,R30
                  ; 0002 00BA // Pin6 Output/Pull configuration: Totempole/No
                  ; 0002 00BB // Pin6 Input/Sense configuration: Sense both edges
                  ; 0002 00BC // Pin6 Inverted: Off
                  ; 0002 00BD PORTC.PIN6CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-00015a 93e0 0656 	STS  1622,R30
+000162 93e0 0656 	STS  1622,R30
                  ; 0002 00BE // Pin7 Output/Pull configuration: Totempole/No
                  ; 0002 00BF // Pin7 Input/Sense configuration: Sense both edges
                  ; 0002 00C0 // Pin7 Inverted: Off
                  ; 0002 00C1 PORTC.PIN7CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-00015c 93e0 0657 	STS  1623,R30
+000164 93e0 0657 	STS  1623,R30
                  ; 0002 00C2 // PORTC Peripheral Output Remapping
                  ; 0002 00C3 // OC0A Output: Pin 0
                  ; 0002 00C4 // OC0B Output: Pin 1
@@ -1741,14 +1758,14 @@ AVRASM ver. 2.1.30  C:\Users\thame\Documents\Atmel Studio\7.0\Blinking-Lights-LE
                  ; 0002 00CA // SPI MOSI: Pin 5
                  ; 0002 00CB // SPI SCK: Pin 7
                  ; 0002 00CC PORTC.REMAP=(0<<PORT_SPI_bp) | (0<<PORT_USART0_bp) | (0<<PORT_TC0D_bp) | (0<<PORT_TC0C_bp) | (0<<PORT_TC0B_bp) | (0<<POR ...
-00015e 93e0 064e 	STS  1614,R30
+000166 93e0 064e 	STS  1614,R30
                  ; 0002 00CD // Interrupt 0 level: Disabled
                  ; 0002 00CE // Interrupt 1 level: Disabled
                  ; 0002 00CF PORTC.INTCTRL=(PORTC.INTCTRL & (~(PORT_INT1LVL_gm | PORT_INT0LVL_gm))) |
                  ; 0002 00D0 	PORT_INT1LVL_OFF_gc | PORT_INT0LVL_OFF_gc;
-000160 91e0 0649 	LDS  R30,1609
-000162 7fe0      	ANDI R30,LOW(0xF0)
-000163 93e0 0649 	STS  1609,R30
+000168 91e0 0649 	LDS  R30,1609
+00016a 7fe0      	ANDI R30,LOW(0xF0)
+00016b 93e0 0649 	STS  1609,R30
                  ; 0002 00D1 // Pin0 Pin Change interrupt 0: Off
                  ; 0002 00D2 // Pin1 Pin Change interrupt 0: Off
                  ; 0002 00D3 // Pin2 Pin Change interrupt 0: Off
@@ -1758,8 +1775,8 @@ AVRASM ver. 2.1.30  C:\Users\thame\Documents\Atmel Studio\7.0\Blinking-Lights-LE
                  ; 0002 00D7 // Pin6 Pin Change interrupt 0: Off
                  ; 0002 00D8 // Pin7 Pin Change interrupt 0: Off
                  ; 0002 00D9 PORTC.INT0MASK=0x00;
-000165 e0e0      	LDI  R30,LOW(0)
-000166 93e0 064a 	STS  1610,R30
+00016d e0e0      	LDI  R30,LOW(0)
+00016e 93e0 064a 	STS  1610,R30
                  ; 0002 00DA // Pin0 Pin Change interrupt 1: Off
                  ; 0002 00DB // Pin1 Pin Change interrupt 1: Off
                  ; 0002 00DC // Pin2 Pin Change interrupt 1: Off
@@ -1769,55 +1786,55 @@ AVRASM ver. 2.1.30  C:\Users\thame\Documents\Atmel Studio\7.0\Blinking-Lights-LE
                  ; 0002 00E0 // Pin6 Pin Change interrupt 1: Off
                  ; 0002 00E1 // Pin7 Pin Change interrupt 1: Off
                  ; 0002 00E2 PORTC.INT1MASK=0x00;
-000168 93e0 064b 	STS  1611,R30
+000170 93e0 064b 	STS  1611,R30
                  ; 0002 00E3 
                  ; 0002 00E4 // PORTD initialization
                  ; 0002 00E5 // OUT register
                  ; 0002 00E6 PORTD.OUT=0x00;
-00016a 93e0 0664 	STS  1636,R30
+000172 93e0 0664 	STS  1636,R30
                  ; 0002 00E7 // Pin0: Input
                  ; 0002 00E8 // Pin1: Input
                  ; 0002 00E9 // Pin2: Input
                  ; 0002 00EA PORTD.DIR=0x00;
-00016c 93e0 0660 	STS  1632,R30
+000174 93e0 0660 	STS  1632,R30
                  ; 0002 00EB // Pin0 Output/Pull configuration: Totempole/No
                  ; 0002 00EC // Pin0 Input/Sense configuration: Sense both edges
                  ; 0002 00ED // Pin0 Inverted: Off
                  ; 0002 00EE PORTD.PIN0CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-00016e 93e0 0670 	STS  1648,R30
+000176 93e0 0670 	STS  1648,R30
                  ; 0002 00EF // Pin1 Output/Pull configuration: Totempole/No
                  ; 0002 00F0 // Pin1 Input/Sense configuration: Sense both edges
                  ; 0002 00F1 // Pin1 Inverted: Off
                  ; 0002 00F2 PORTD.PIN1CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-000170 93e0 0671 	STS  1649,R30
+000178 93e0 0671 	STS  1649,R30
                  ; 0002 00F3 // Pin2 Output/Pull configuration: Totempole/No
                  ; 0002 00F4 // Pin2 Input/Sense configuration: Sense both edges
                  ; 0002 00F5 // Pin2 Inverted: Off
                  ; 0002 00F6 PORTD.PIN2CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-000172 93e0 0672 	STS  1650,R30
+00017a 93e0 0672 	STS  1650,R30
                  ; 0002 00F7 // Interrupt 0 level: Disabled
                  ; 0002 00F8 // Interrupt 1 level: Disabled
                  ; 0002 00F9 PORTD.INTCTRL=(PORTD.INTCTRL & (~(PORT_INT1LVL_gm | PORT_INT0LVL_gm))) |
                  ; 0002 00FA 	PORT_INT1LVL_OFF_gc | PORT_INT0LVL_OFF_gc;
-000174 91e0 0669 	LDS  R30,1641
-000176 7fe0      	ANDI R30,LOW(0xF0)
-000177 93e0 0669 	STS  1641,R30
+00017c 91e0 0669 	LDS  R30,1641
+00017e 7fe0      	ANDI R30,LOW(0xF0)
+00017f 93e0 0669 	STS  1641,R30
                  ; 0002 00FB // Pin0 Pin Change interrupt 0: Off
                  ; 0002 00FC // Pin1 Pin Change interrupt 0: Off
                  ; 0002 00FD // Pin2 Pin Change interrupt 0: Off
                  ; 0002 00FE PORTD.INT0MASK=0x00;
-000179 e0e0      	LDI  R30,LOW(0)
-00017a 93e0 066a 	STS  1642,R30
+000181 e0e0      	LDI  R30,LOW(0)
+000182 93e0 066a 	STS  1642,R30
                  ; 0002 00FF // Pin0 Pin Change interrupt 1: Off
                  ; 0002 0100 // Pin1 Pin Change interrupt 1: Off
                  ; 0002 0101 // Pin2 Pin Change interrupt 1: Off
                  ; 0002 0102 PORTD.INT1MASK=0x00;
-00017c 93e0 066b 	STS  1643,R30
+000184 93e0 066b 	STS  1643,R30
                  ; 0002 0103 
                  ; 0002 0104 // PORTE initialization
                  ; 0002 0105 // OUT register
                  ; 0002 0106 PORTE.OUT=0x00;
-00017e 93e0 0684 	STS  1668,R30
+000186 93e0 0684 	STS  1668,R30
                  ; 0002 0107 // Pin0: Input
                  ; 0002 0108 // Pin1: Input
                  ; 0002 0109 // Pin2: Input
@@ -1827,49 +1844,49 @@ AVRASM ver. 2.1.30  C:\Users\thame\Documents\Atmel Studio\7.0\Blinking-Lights-LE
                  ; 0002 010D // Pin6: Input
                  ; 0002 010E // Pin7: Input
                  ; 0002 010F PORTE.DIR=0x20;
-000180 e2e0      	LDI  R30,LOW(32)
-000181 93e0 0680 	STS  1664,R30
+000188 e2e0      	LDI  R30,LOW(32)
+000189 93e0 0680 	STS  1664,R30
                  ; 0002 0110 // Pin0 Output/Pull configuration: Totempole/No
                  ; 0002 0111 // Pin0 Input/Sense configuration: Sense both edges
                  ; 0002 0112 // Pin0 Inverted: Off
                  ; 0002 0113 PORTE.PIN0CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-000183 e0e0      	LDI  R30,LOW(0)
-000184 93e0 0690 	STS  1680,R30
+00018b e0e0      	LDI  R30,LOW(0)
+00018c 93e0 0690 	STS  1680,R30
                  ; 0002 0114 // Pin1 Output/Pull configuration: Totempole/No
                  ; 0002 0115 // Pin1 Input/Sense configuration: Sense both edges
                  ; 0002 0116 // Pin1 Inverted: Off
                  ; 0002 0117 PORTE.PIN1CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-000186 93e0 0691 	STS  1681,R30
+00018e 93e0 0691 	STS  1681,R30
                  ; 0002 0118 // Pin2 Output/Pull configuration: Totempole/No
                  ; 0002 0119 // Pin2 Input/Sense configuration: Sense both edges
                  ; 0002 011A // Pin2 Inverted: Off
                  ; 0002 011B PORTE.PIN2CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-000188 93e0 0692 	STS  1682,R30
+000190 93e0 0692 	STS  1682,R30
                  ; 0002 011C // Pin3 Output/Pull configuration: Totempole/No
                  ; 0002 011D // Pin3 Input/Sense configuration: Sense both edges
                  ; 0002 011E // Pin3 Inverted: Off
                  ; 0002 011F PORTE.PIN3CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-00018a 93e0 0693 	STS  1683,R30
+000192 93e0 0693 	STS  1683,R30
                  ; 0002 0120 // Pin4 Output/Pull configuration: Totempole/No
                  ; 0002 0121 // Pin4 Input/Sense configuration: Sense both edges
                  ; 0002 0122 // Pin4 Inverted: Off
                  ; 0002 0123 PORTE.PIN4CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-00018c 93e0 0694 	STS  1684,R30
+000194 93e0 0694 	STS  1684,R30
                  ; 0002 0124 // Pin5 Output/Pull configuration: Totempole/No
                  ; 0002 0125 // Pin5 Input/Sense configuration: Sense both edges
                  ; 0002 0126 // Pin5 Inverted: Off
                  ; 0002 0127 PORTE.PIN5CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-00018e 93e0 0695 	STS  1685,R30
+000196 93e0 0695 	STS  1685,R30
                  ; 0002 0128 // Pin6 Output/Pull configuration: Totempole/No
                  ; 0002 0129 // Pin6 Input/Sense configuration: Sense both edges
                  ; 0002 012A // Pin6 Inverted: Off
                  ; 0002 012B PORTE.PIN6CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-000190 93e0 0696 	STS  1686,R30
+000198 93e0 0696 	STS  1686,R30
                  ; 0002 012C // Pin7 Output/Pull configuration: Totempole/No
                  ; 0002 012D // Pin7 Input/Sense configuration: Sense both edges
                  ; 0002 012E // Pin7 Inverted: Off
                  ; 0002 012F PORTE.PIN7CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-000192 93e0 0697 	STS  1687,R30
+00019a 93e0 0697 	STS  1687,R30
                  ; 0002 0130 // PORTE Peripheral Output Remapping
                  ; 0002 0131 // OC0A Output: Pin 0
                  ; 0002 0132 // OC0B Output: Pin 1
@@ -1881,14 +1898,14 @@ AVRASM ver. 2.1.30  C:\Users\thame\Documents\Atmel Studio\7.0\Blinking-Lights-LE
                  ; 0002 0138 // SPI MOSI: Pin -1
                  ; 0002 0139 // SPI SCK: Pin -1
                  ; 0002 013A PORTE.REMAP=(0<<PORT_SPI_bp) | (0<<PORT_USART0_bp) | (0<<PORT_TC0D_bp) | (0<<PORT_TC0C_bp) | (0<<PORT_TC0B_bp) | (0<<POR ...
-000194 93e0 068e 	STS  1678,R30
+00019c 93e0 068e 	STS  1678,R30
                  ; 0002 013B // Interrupt 0 level: Disabled
                  ; 0002 013C // Interrupt 1 level: Disabled
                  ; 0002 013D PORTE.INTCTRL=(PORTE.INTCTRL & (~(PORT_INT1LVL_gm | PORT_INT0LVL_gm))) |
                  ; 0002 013E 	PORT_INT1LVL_OFF_gc | PORT_INT0LVL_OFF_gc;
-000196 91e0 0689 	LDS  R30,1673
-000198 7fe0      	ANDI R30,LOW(0xF0)
-000199 93e0 0689 	STS  1673,R30
+00019e 91e0 0689 	LDS  R30,1673
+0001a0 7fe0      	ANDI R30,LOW(0xF0)
+0001a1 93e0 0689 	STS  1673,R30
                  ; 0002 013F // Pin0 Pin Change interrupt 0: Off
                  ; 0002 0140 // Pin1 Pin Change interrupt 0: Off
                  ; 0002 0141 // Pin2 Pin Change interrupt 0: Off
@@ -1898,8 +1915,8 @@ AVRASM ver. 2.1.30  C:\Users\thame\Documents\Atmel Studio\7.0\Blinking-Lights-LE
                  ; 0002 0145 // Pin6 Pin Change interrupt 0: Off
                  ; 0002 0146 // Pin7 Pin Change interrupt 0: Off
                  ; 0002 0147 PORTE.INT0MASK=0x00;
-00019b e0e0      	LDI  R30,LOW(0)
-00019c 93e0 068a 	STS  1674,R30
+0001a3 e0e0      	LDI  R30,LOW(0)
+0001a4 93e0 068a 	STS  1674,R30
                  ; 0002 0148 // Pin0 Pin Change interrupt 1: Off
                  ; 0002 0149 // Pin1 Pin Change interrupt 1: Off
                  ; 0002 014A // Pin2 Pin Change interrupt 1: Off
@@ -1909,12 +1926,12 @@ AVRASM ver. 2.1.30  C:\Users\thame\Documents\Atmel Studio\7.0\Blinking-Lights-LE
                  ; 0002 014E // Pin6 Pin Change interrupt 1: Off
                  ; 0002 014F // Pin7 Pin Change interrupt 1: Off
                  ; 0002 0150 PORTE.INT1MASK=0x00;
-00019e 93e0 068b 	STS  1675,R30
+0001a6 93e0 068b 	STS  1675,R30
                  ; 0002 0151 
                  ; 0002 0152 // PORTG initialization
                  ; 0002 0153 // OUT register
                  ; 0002 0154 PORTG.OUT=0x00;
-0001a0 93e0 06c4 	STS  1732,R30
+0001a8 93e0 06c4 	STS  1732,R30
                  ; 0002 0155 // Pin0: Input
                  ; 0002 0156 // Pin1: Input
                  ; 0002 0157 // Pin2: Input
@@ -1924,54 +1941,54 @@ AVRASM ver. 2.1.30  C:\Users\thame\Documents\Atmel Studio\7.0\Blinking-Lights-LE
                  ; 0002 015B // Pin6: Input
                  ; 0002 015C // Pin7: Input
                  ; 0002 015D PORTG.DIR=0x00;
-0001a2 93e0 06c0 	STS  1728,R30
+0001aa 93e0 06c0 	STS  1728,R30
                  ; 0002 015E // Pin0 Output/Pull configuration: Totempole/No
                  ; 0002 015F // Pin0 Input/Sense configuration: Sense both edges
                  ; 0002 0160 // Pin0 Inverted: Off
                  ; 0002 0161 PORTG.PIN0CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-0001a4 93e0 06d0 	STS  1744,R30
+0001ac 93e0 06d0 	STS  1744,R30
                  ; 0002 0162 // Pin1 Output/Pull configuration: Totempole/No
                  ; 0002 0163 // Pin1 Input/Sense configuration: Sense both edges
                  ; 0002 0164 // Pin1 Inverted: Off
                  ; 0002 0165 PORTG.PIN1CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-0001a6 93e0 06d1 	STS  1745,R30
+0001ae 93e0 06d1 	STS  1745,R30
                  ; 0002 0166 // Pin2 Output/Pull configuration: Totempole/No
                  ; 0002 0167 // Pin2 Input/Sense configuration: Sense both edges
                  ; 0002 0168 // Pin2 Inverted: Off
                  ; 0002 0169 PORTG.PIN2CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-0001a8 93e0 06d2 	STS  1746,R30
+0001b0 93e0 06d2 	STS  1746,R30
                  ; 0002 016A // Pin3 Output/Pull configuration: Totempole/No
                  ; 0002 016B // Pin3 Input/Sense configuration: Sense both edges
                  ; 0002 016C // Pin3 Inverted: Off
                  ; 0002 016D PORTG.PIN3CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-0001aa 93e0 06d3 	STS  1747,R30
+0001b2 93e0 06d3 	STS  1747,R30
                  ; 0002 016E // Pin4 Output/Pull configuration: Totempole/No
                  ; 0002 016F // Pin4 Input/Sense configuration: Sense both edges
                  ; 0002 0170 // Pin4 Inverted: Off
                  ; 0002 0171 PORTG.PIN4CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-0001ac 93e0 06d4 	STS  1748,R30
+0001b4 93e0 06d4 	STS  1748,R30
                  ; 0002 0172 // Pin5 Output/Pull configuration: Totempole/No
                  ; 0002 0173 // Pin5 Input/Sense configuration: Sense both edges
                  ; 0002 0174 // Pin5 Inverted: Off
                  ; 0002 0175 PORTG.PIN5CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-0001ae 93e0 06d5 	STS  1749,R30
+0001b6 93e0 06d5 	STS  1749,R30
                  ; 0002 0176 // Pin6 Output/Pull configuration: Totempole/No
                  ; 0002 0177 // Pin6 Input/Sense configuration: Sense both edges
                  ; 0002 0178 // Pin6 Inverted: Off
                  ; 0002 0179 PORTG.PIN6CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-0001b0 93e0 06d6 	STS  1750,R30
+0001b8 93e0 06d6 	STS  1750,R30
                  ; 0002 017A // Pin7 Output/Pull configuration: Totempole/No
                  ; 0002 017B // Pin7 Input/Sense configuration: Sense both edges
                  ; 0002 017C // Pin7 Inverted: Off
                  ; 0002 017D PORTG.PIN7CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-0001b2 93e0 06d7 	STS  1751,R30
+0001ba 93e0 06d7 	STS  1751,R30
                  ; 0002 017E // Interrupt 0 level: Disabled
                  ; 0002 017F // Interrupt 1 level: Disabled
                  ; 0002 0180 PORTG.INTCTRL=(PORTG.INTCTRL & (~(PORT_INT1LVL_gm | PORT_INT0LVL_gm))) |
                  ; 0002 0181 	PORT_INT1LVL_OFF_gc | PORT_INT0LVL_OFF_gc;
-0001b4 91e0 06c9 	LDS  R30,1737
-0001b6 7fe0      	ANDI R30,LOW(0xF0)
-0001b7 93e0 06c9 	STS  1737,R30
+0001bc 91e0 06c9 	LDS  R30,1737
+0001be 7fe0      	ANDI R30,LOW(0xF0)
+0001bf 93e0 06c9 	STS  1737,R30
                  ; 0002 0182 // Pin0 Pin Change interrupt 0: Off
                  ; 0002 0183 // Pin1 Pin Change interrupt 0: Off
                  ; 0002 0184 // Pin2 Pin Change interrupt 0: Off
@@ -1981,8 +1998,8 @@ AVRASM ver. 2.1.30  C:\Users\thame\Documents\Atmel Studio\7.0\Blinking-Lights-LE
                  ; 0002 0188 // Pin6 Pin Change interrupt 0: Off
                  ; 0002 0189 // Pin7 Pin Change interrupt 0: Off
                  ; 0002 018A PORTG.INT0MASK=0x00;
-0001b9 e0e0      	LDI  R30,LOW(0)
-0001ba 93e0 06ca 	STS  1738,R30
+0001c1 e0e0      	LDI  R30,LOW(0)
+0001c2 93e0 06ca 	STS  1738,R30
                  ; 0002 018B // Pin0 Pin Change interrupt 1: Off
                  ; 0002 018C // Pin1 Pin Change interrupt 1: Off
                  ; 0002 018D // Pin2 Pin Change interrupt 1: Off
@@ -1992,12 +2009,12 @@ AVRASM ver. 2.1.30  C:\Users\thame\Documents\Atmel Studio\7.0\Blinking-Lights-LE
                  ; 0002 0191 // Pin6 Pin Change interrupt 1: Off
                  ; 0002 0192 // Pin7 Pin Change interrupt 1: Off
                  ; 0002 0193 PORTG.INT1MASK=0x00;
-0001bc 93e0 06cb 	STS  1739,R30
+0001c4 93e0 06cb 	STS  1739,R30
                  ; 0002 0194 
                  ; 0002 0195 // PORTM initialization
                  ; 0002 0196 // OUT register
                  ; 0002 0197 PORTM.OUT=0x00;
-0001be 93e0 0764 	STS  1892,R30
+0001c6 93e0 0764 	STS  1892,R30
                  ; 0002 0198 // Pin0: Input
                  ; 0002 0199 // Pin1: Input
                  ; 0002 019A // Pin2: Input
@@ -2007,54 +2024,54 @@ AVRASM ver. 2.1.30  C:\Users\thame\Documents\Atmel Studio\7.0\Blinking-Lights-LE
                  ; 0002 019E // Pin6: Input
                  ; 0002 019F // Pin7: Input
                  ; 0002 01A0 PORTM.DIR=0x00;
-0001c0 93e0 0760 	STS  1888,R30
+0001c8 93e0 0760 	STS  1888,R30
                  ; 0002 01A1 // Pin0 Output/Pull configuration: Totempole/No
                  ; 0002 01A2 // Pin0 Input/Sense configuration: Sense both edges
                  ; 0002 01A3 // Pin0 Inverted: Off
                  ; 0002 01A4 PORTM.PIN0CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-0001c2 93e0 0770 	STS  1904,R30
+0001ca 93e0 0770 	STS  1904,R30
                  ; 0002 01A5 // Pin1 Output/Pull configuration: Totempole/No
                  ; 0002 01A6 // Pin1 Input/Sense configuration: Sense both edges
                  ; 0002 01A7 // Pin1 Inverted: Off
                  ; 0002 01A8 PORTM.PIN1CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-0001c4 93e0 0771 	STS  1905,R30
+0001cc 93e0 0771 	STS  1905,R30
                  ; 0002 01A9 // Pin2 Output/Pull configuration: Totempole/No
                  ; 0002 01AA // Pin2 Input/Sense configuration: Sense both edges
                  ; 0002 01AB // Pin2 Inverted: Off
                  ; 0002 01AC PORTM.PIN2CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-0001c6 93e0 0772 	STS  1906,R30
+0001ce 93e0 0772 	STS  1906,R30
                  ; 0002 01AD // Pin3 Output/Pull configuration: Totempole/No
                  ; 0002 01AE // Pin3 Input/Sense configuration: Sense both edges
                  ; 0002 01AF // Pin3 Inverted: Off
                  ; 0002 01B0 PORTM.PIN3CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-0001c8 93e0 0773 	STS  1907,R30
+0001d0 93e0 0773 	STS  1907,R30
                  ; 0002 01B1 // Pin4 Output/Pull configuration: Totempole/No
                  ; 0002 01B2 // Pin4 Input/Sense configuration: Sense both edges
                  ; 0002 01B3 // Pin4 Inverted: Off
                  ; 0002 01B4 PORTM.PIN4CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-0001ca 93e0 0774 	STS  1908,R30
+0001d2 93e0 0774 	STS  1908,R30
                  ; 0002 01B5 // Pin5 Output/Pull configuration: Totempole/No
                  ; 0002 01B6 // Pin5 Input/Sense configuration: Sense both edges
                  ; 0002 01B7 // Pin5 Inverted: Off
                  ; 0002 01B8 PORTM.PIN5CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-0001cc 93e0 0775 	STS  1909,R30
+0001d4 93e0 0775 	STS  1909,R30
                  ; 0002 01B9 // Pin6 Output/Pull configuration: Totempole/No
                  ; 0002 01BA // Pin6 Input/Sense configuration: Sense both edges
                  ; 0002 01BB // Pin6 Inverted: Off
                  ; 0002 01BC PORTM.PIN6CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-0001ce 93e0 0776 	STS  1910,R30
+0001d6 93e0 0776 	STS  1910,R30
                  ; 0002 01BD // Pin7 Output/Pull configuration: Totempole/No
                  ; 0002 01BE // Pin7 Input/Sense configuration: Sense both edges
                  ; 0002 01BF // Pin7 Inverted: Off
                  ; 0002 01C0 PORTM.PIN7CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-0001d0 93e0 0777 	STS  1911,R30
+0001d8 93e0 0777 	STS  1911,R30
                  ; 0002 01C1 // Interrupt 0 level: Disabled
                  ; 0002 01C2 // Interrupt 1 level: Disabled
                  ; 0002 01C3 PORTM.INTCTRL=(PORTM.INTCTRL & (~(PORT_INT1LVL_gm | PORT_INT0LVL_gm))) |
                  ; 0002 01C4 	PORT_INT1LVL_OFF_gc | PORT_INT0LVL_OFF_gc;
-0001d2 91e0 0769 	LDS  R30,1897
-0001d4 7fe0      	ANDI R30,LOW(0xF0)
-0001d5 93e0 0769 	STS  1897,R30
+0001da 91e0 0769 	LDS  R30,1897
+0001dc 7fe0      	ANDI R30,LOW(0xF0)
+0001dd 93e0 0769 	STS  1897,R30
                  ; 0002 01C5 // Pin0 Pin Change interrupt 0: Off
                  ; 0002 01C6 // Pin1 Pin Change interrupt 0: Off
                  ; 0002 01C7 // Pin2 Pin Change interrupt 0: Off
@@ -2064,8 +2081,8 @@ AVRASM ver. 2.1.30  C:\Users\thame\Documents\Atmel Studio\7.0\Blinking-Lights-LE
                  ; 0002 01CB // Pin6 Pin Change interrupt 0: Off
                  ; 0002 01CC // Pin7 Pin Change interrupt 0: Off
                  ; 0002 01CD PORTM.INT0MASK=0x00;
-0001d7 e0e0      	LDI  R30,LOW(0)
-0001d8 93e0 076a 	STS  1898,R30
+0001df e0e0      	LDI  R30,LOW(0)
+0001e0 93e0 076a 	STS  1898,R30
                  ; 0002 01CE // Pin0 Pin Change interrupt 1: Off
                  ; 0002 01CF // Pin1 Pin Change interrupt 1: Off
                  ; 0002 01D0 // Pin2 Pin Change interrupt 1: Off
@@ -2075,44 +2092,44 @@ AVRASM ver. 2.1.30  C:\Users\thame\Documents\Atmel Studio\7.0\Blinking-Lights-LE
                  ; 0002 01D4 // Pin6 Pin Change interrupt 1: Off
                  ; 0002 01D5 // Pin7 Pin Change interrupt 1: Off
                  ; 0002 01D6 PORTM.INT1MASK=0x00;
-0001da 93e0 076b 	STS  1899,R30
+0001e2 93e0 076b 	STS  1899,R30
                  ; 0002 01D7 
                  ; 0002 01D8 // PORTR initialization
                  ; 0002 01D9 // OUT register
                  ; 0002 01DA PORTR.OUT=0x00;
-0001dc 93e0 07e4 	STS  2020,R30
+0001e4 93e0 07e4 	STS  2020,R30
                  ; 0002 01DB // Pin0: Input
                  ; 0002 01DC // Pin1: Input
                  ; 0002 01DD PORTR.DIR=0x00;
-0001de 93e0 07e0 	STS  2016,R30
+0001e6 93e0 07e0 	STS  2016,R30
                  ; 0002 01DE // Pin0 Output/Pull configuration: Totempole/No
                  ; 0002 01DF // Pin0 Input/Sense configuration: Sense both edges
                  ; 0002 01E0 // Pin0 Inverted: Off
                  ; 0002 01E1 PORTR.PIN0CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-0001e0 93e0 07f0 	STS  2032,R30
+0001e8 93e0 07f0 	STS  2032,R30
                  ; 0002 01E2 // Pin1 Output/Pull configuration: Totempole/No
                  ; 0002 01E3 // Pin1 Input/Sense configuration: Sense both edges
                  ; 0002 01E4 // Pin1 Inverted: Off
                  ; 0002 01E5 PORTR.PIN1CTRL=PORT_OPC_TOTEM_gc | PORT_ISC_BOTHEDGES_gc;
-0001e2 93e0 07f1 	STS  2033,R30
+0001ea 93e0 07f1 	STS  2033,R30
                  ; 0002 01E6 // Interrupt 0 level: Disabled
                  ; 0002 01E7 // Interrupt 1 level: Disabled
                  ; 0002 01E8 PORTR.INTCTRL=(PORTR.INTCTRL & (~(PORT_INT1LVL_gm | PORT_INT0LVL_gm))) |
                  ; 0002 01E9 	PORT_INT1LVL_OFF_gc | PORT_INT0LVL_OFF_gc;
-0001e4 91e0 07e9 	LDS  R30,2025
-0001e6 7fe0      	ANDI R30,LOW(0xF0)
-0001e7 93e0 07e9 	STS  2025,R30
+0001ec 91e0 07e9 	LDS  R30,2025
+0001ee 7fe0      	ANDI R30,LOW(0xF0)
+0001ef 93e0 07e9 	STS  2025,R30
                  ; 0002 01EA // Pin0 Pin Change interrupt 0: Off
                  ; 0002 01EB // Pin1 Pin Change interrupt 0: Off
                  ; 0002 01EC PORTR.INT0MASK=0x00;
-0001e9 e0e0      	LDI  R30,LOW(0)
-0001ea 93e0 07ea 	STS  2026,R30
+0001f1 e0e0      	LDI  R30,LOW(0)
+0001f2 93e0 07ea 	STS  2026,R30
                  ; 0002 01ED // Pin0 Pin Change interrupt 1: Off
                  ; 0002 01EE // Pin1 Pin Change interrupt 1: Off
                  ; 0002 01EF PORTR.INT1MASK=0x00;
-0001ec 93e0 07eb 	STS  2027,R30
+0001f4 93e0 07eb 	STS  2027,R30
                  ; 0002 01F0 }
-0001ee 9508      	RET
+0001f6 9508      	RET
                  ; .FEND
                  ;
                  ;// Virtual Ports initialization
@@ -2123,15 +2140,15 @@ AVRASM ver. 2.1.30  C:\Users\thame\Documents\Atmel Studio\7.0\Blinking-Lights-LE
                  ; 0002 01F5 // PORTA mapped to VPORT0
                  ; 0002 01F6 // PORTB mapped to VPORT1
                  ; 0002 01F7 PORTCFG.VPCTRLA=PORTCFG_VP13MAP_PORTB_gc | PORTCFG_VP02MAP_PORTA_gc;
-0001ef e1e0      	LDI  R30,LOW(16)
-0001f0 93e0 00b2 	STS  178,R30
+0001f7 e1e0      	LDI  R30,LOW(16)
+0001f8 93e0 00b2 	STS  178,R30
                  ; 0002 01F8 // PORTC mapped to VPORT2
                  ; 0002 01F9 // PORTD mapped to VPORT3
                  ; 0002 01FA PORTCFG.VPCTRLB=PORTCFG_VP13MAP_PORTD_gc | PORTCFG_VP02MAP_PORTC_gc;
-0001f2 e3e2      	LDI  R30,LOW(50)
-0001f3 93e0 00b3 	STS  179,R30
+0001fa e3e2      	LDI  R30,LOW(50)
+0001fb 93e0 00b3 	STS  179,R30
                  ; 0002 01FB }
-0001f5 9508      	RET
+0001fd 9508      	RET
                  ; .FEND
                  ;
                  ;/*******************************************************
@@ -2145,223 +2162,309 @@ AVRASM ver. 2.1.30  C:\Users\thame\Documents\Atmel Studio\7.0\Blinking-Lights-LE
                  ;
                  ;// I/O Registers definitions
                  ;#include <xmega128b1.h>
+                 ;#include <stdint.h>
                  ;
                  ;// Disable a Timer/Counter type TC0
                  ;void tc0_disable(TC0_t *ptc)
-                 ; 0003 000F {
+                 ; 0003 0010 {
                  
                  	.CSEG
                  _tc0_disable:
                  ; .FSTART _tc0_disable
-                 ; 0003 0010 // Timer/Counter off
-                 ; 0003 0011 ptc->CTRLA=TC_CLKSEL_OFF_gc;
-0001f6 931a      	ST   -Y,R17
-0001f7 930a      	ST   -Y,R16
-0001f8 018d      	MOVW R16,R26
+                 ; 0003 0011 // Timer/Counter off
+                 ; 0003 0012 ptc->CTRLA=TC_CLKSEL_OFF_gc;
+0001fe 931a      	ST   -Y,R17
+0001ff 930a      	ST   -Y,R16
+000200 018d      	MOVW R16,R26
                  ;	*ptc -> R16,R17
-0001f9 e0e0      	LDI  R30,LOW(0)
-0001fa 93ec      	ST   X,R30
-                 ; 0003 0012 // Issue a reset command
-                 ; 0003 0013 ptc->CTRLFSET=TC_CMD_RESET_gc;
-0001fb 9619      	ADIW R26,9
-0001fc e0ec      	LDI  R30,LOW(12)
-0001fd 93ec      	ST   X,R30
-                 ; 0003 0014 }
-0001fe c05c      	RJMP _0x2060001
+000201 e0e0      	LDI  R30,LOW(0)
+000202 93ec      	ST   X,R30
+                 ; 0003 0013 // Issue a reset command
+                 ; 0003 0014 ptc->CTRLFSET=TC_CMD_RESET_gc;
+000203 9619      	ADIW R26,9
+000204 e0ec      	LDI  R30,LOW(12)
+000205 93ec      	ST   X,R30
+                 ; 0003 0015 }
+000206 c05c      	RJMP _0x2060001
                  ; .FEND
                  ;
                  ;// Timer/Counter TCC0 initialization
                  ;void tcc0_init(void)
-                 ; 0003 0018 {
+                 ; 0003 0019 {
                  _tcc0_init:
                  ; .FSTART _tcc0_init
-                 ; 0003 0019 unsigned char s;
-                 ; 0003 001A unsigned char n;
-                 ; 0003 001B 
-                 ; 0003 001C // Note: The correct PORTC direction for the Compare Channels
-                 ; 0003 001D // outputs is configured in the ports_init function.
-                 ; 0003 001E 
-                 ; 0003 001F // Save interrupts enabled/disabled state
-                 ; 0003 0020 s=SREG;
-0001ff 931a      	ST   -Y,R17
-000200 930a      	ST   -Y,R16
+                 ; 0003 001A unsigned char s;
+                 ; 0003 001B unsigned char n;
+                 ; 0003 001C 
+                 ; 0003 001D // Note: The correct PORTC direction for the Compare Channels
+                 ; 0003 001E // outputs is configured in the ports_init function.
+                 ; 0003 001F 
+                 ; 0003 0020 // Save interrupts enabled/disabled state
+                 ; 0003 0021 s=SREG;
+000207 931a      	ST   -Y,R17
+000208 930a      	ST   -Y,R16
                  ;	s -> R17
                  ;	n -> R16
-000201 b71f      	IN   R17,63
-                 ; 0003 0021 // Disable interrupts
-                 ; 0003 0022 #asm("cli")
-000202 94f8      	CLI
-                 ; 0003 0023 
-                 ; 0003 0024 // Disable and reset the timer/counter just to be sure
-                 ; 0003 0025 tc0_disable(&TCC0);
-000203 e0a0      	LDI  R26,LOW(2048)
-000204 e0b8      	LDI  R27,HIGH(2048)
-000205 dff0      	RCALL _tc0_disable
-                 ; 0003 0026 // Clock source: ClkPer/1
-                 ; 0003 0027 TCC0.CTRLA=TC_CLKSEL_DIV1_gc;
-000206 e0e1      	LDI  R30,LOW(1)
-000207 93e0 0800 	STS  2048,R30
-                 ; 0003 0028 // Mode: Normal Operation, Overflow Int./Event on TOP
-                 ; 0003 0029 // Compare/Capture on channel A: Off
-                 ; 0003 002A // Compare/Capture on channel B: Off
-                 ; 0003 002B // Compare/Capture on channel C: Off
-                 ; 0003 002C // Compare/Capture on channel D: Off
-                 ; 0003 002D TCC0.CTRLB=(0<<TC0_CCDEN_bp) | (0<<TC0_CCCEN_bp) | (0<<TC0_CCBEN_bp) | (0<<TC0_CCAEN_bp) |
-                 ; 0003 002E 	TC_WGMODE_NORMAL_gc;
-000209 e0e0      	LDI  R30,LOW(0)
-00020a 93e0 0801 	STS  2049,R30
-                 ; 0003 002F // Capture event source: None
-                 ; 0003 0030 // Capture event action: None
-                 ; 0003 0031 TCC0.CTRLD=TC_EVACT_OFF_gc | TC_EVSEL_OFF_gc;
-00020c 93e0 0803 	STS  2051,R30
-                 ; 0003 0032 
-                 ; 0003 0033 // Set Timer/Counter in Normal mode
-                 ; 0003 0034 TCC0.CTRLE=TC_BYTEM_NORMAL_gc;
-00020e 93e0 0804 	STS  2052,R30
-                 ; 0003 0035 
-                 ; 0003 0036 // Overflow interrupt: High Level
-                 ; 0003 0037 // Error interrupt: Disabled
-                 ; 0003 0038 TCC0.INTCTRLA=TC_ERRINTLVL_OFF_gc | TC_OVFINTLVL_HI_gc;
-000210 e0e3      	LDI  R30,LOW(3)
-000211 93e0 0806 	STS  2054,R30
-                 ; 0003 0039 
-                 ; 0003 003A // Compare/Capture channel A interrupt: Disabled
-                 ; 0003 003B // Compare/Capture channel B interrupt: Disabled
-                 ; 0003 003C // Compare/Capture channel C interrupt: Disabled
-                 ; 0003 003D // Compare/Capture channel D interrupt: Disabled
-                 ; 0003 003E TCC0.INTCTRLB=TC_CCDINTLVL_OFF_gc | TC_CCCINTLVL_OFF_gc | TC_CCBINTLVL_OFF_gc | TC_CCAINTLVL_OFF_gc;
-000213 e0e0      	LDI  R30,LOW(0)
-000214 93e0 0807 	STS  2055,R30
-                 ; 0003 003F 
-                 ; 0003 0040 // High resolution extension: Off
-                 ; 0003 0041 HIRESC.CTRLA&= ~HIRES_HREN0_bm;
-000216 91e0 0890 	LDS  R30,2192
-000218 7fee      	ANDI R30,0xFE
-000219 93e0 0890 	STS  2192,R30
-                 ; 0003 0042 
-                 ; 0003 0043 // Advanced Waveform Extension initialization
-                 ; 0003 0044 // Optimize for speed
-                 ; 0003 0045 #pragma optsize-
-                 ; 0003 0046 // Disable locking the AWEX configuration registers just to be sure
-                 ; 0003 0047 n=MCU.AWEXLOCK & (~MCU_AWEXCLOCK_bm);
-00021b 91e0 0099 	LDS  R30,153
-00021d 7fee      	ANDI R30,0xFE
-00021e 2f0e      	MOV  R16,R30
-                 ; 0003 0048 CCP=CCP_IOREG_gc;
-00021f ede8      	LDI  R30,LOW(216)
-000220 bfe4      	OUT  0x34,R30
-                 ; 0003 0049 MCU.AWEXLOCK=n;
-000221 9300 0099 	STS  153,R16
-                 ; 0003 004A // Restore optimization for size if needed
-                 ; 0003 004B #pragma optsize_default
-                 ; 0003 004C 
-                 ; 0003 004D // Pattern generation: Off
-                 ; 0003 004E // Dead time insertion: Off
-                 ; 0003 004F AWEXC.CTRL=(0<<AWEX_PGM_bp) | (0<<AWEX_CWCM_bp) | (0<<AWEX_DTICCDEN_bp) | (0<<AWEX_DTICCCEN_bp) |
-                 ; 0003 0050 	(0<<AWEX_DTICCBEN_bp) | (0<<AWEX_DTICCAEN_bp);
-000223 e0e0      	LDI  R30,LOW(0)
-000224 93e0 0880 	STS  2176,R30
-                 ; 0003 0051 
-                 ; 0003 0052 // Fault protection initialization
-                 ; 0003 0053 // Fault detection on OCD Break detection: On
-                 ; 0003 0054 // Fault detection restart mode: Latched Mode
-                 ; 0003 0055 // Fault detection action: None (Fault protection disabled)
-                 ; 0003 0056 AWEXC.FDCTRL=(AWEXC.FDCTRL & (~(AWEX_FDDBD_bm | AWEX_FDMODE_bm | AWEX_FDACT_gm))) |
-                 ; 0003 0057 	(0<<AWEX_FDDBD_bp) | (0<<AWEX_FDMODE_bp) | AWEX_FDACT_NONE_gc;
-000226 91e0 0883 	LDS  R30,2179
-000228 7ee8      	ANDI R30,LOW(0xE8)
-000229 93e0 0883 	STS  2179,R30
-                 ; 0003 0058 // Fault detect events:
-                 ; 0003 0059 // Event channel 0: Off
-                 ; 0003 005A // Event channel 1: Off
-                 ; 0003 005B // Event channel 2: Off
-                 ; 0003 005C // Event channel 3: Off
-                 ; 0003 005D // Event channel 4: Off
-                 ; 0003 005E // Event channel 5: Off
-                 ; 0003 005F // Event channel 6: Off
-                 ; 0003 0060 // Event channel 7: Off
-                 ; 0003 0061 AWEXC.FDEMASK=0b00000000;
+000209 b71f      	IN   R17,63
+                 ; 0003 0022 // Disable interrupts
+                 ; 0003 0023 #asm("cli")
+00020a 94f8      	CLI
+                 ; 0003 0024 
+                 ; 0003 0025 // Disable and reset the timer/counter just to be sure
+                 ; 0003 0026 tc0_disable(&TCC0);
+00020b e0a0      	LDI  R26,LOW(2048)
+00020c e0b8      	LDI  R27,HIGH(2048)
+00020d dff0      	RCALL _tc0_disable
+                 ; 0003 0027 // Clock source: ClkPer/1
+                 ; 0003 0028 TCC0.CTRLA=TC_CLKSEL_DIV1_gc;
+00020e e0e1      	LDI  R30,LOW(1)
+00020f 93e0 0800 	STS  2048,R30
+                 ; 0003 0029 // Mode: Normal Operation, Overflow Int./Event on TOP
+                 ; 0003 002A // Compare/Capture on channel A: Off
+                 ; 0003 002B // Compare/Capture on channel B: Off
+                 ; 0003 002C // Compare/Capture on channel C: Off
+                 ; 0003 002D // Compare/Capture on channel D: Off
+                 ; 0003 002E TCC0.CTRLB=(0<<TC0_CCDEN_bp) | (0<<TC0_CCCEN_bp) | (0<<TC0_CCBEN_bp) | (0<<TC0_CCAEN_bp) |
+                 ; 0003 002F 	TC_WGMODE_NORMAL_gc;
+000211 e0e0      	LDI  R30,LOW(0)
+000212 93e0 0801 	STS  2049,R30
+                 ; 0003 0030 // Capture event source: None
+                 ; 0003 0031 // Capture event action: None
+                 ; 0003 0032 TCC0.CTRLD=TC_EVACT_OFF_gc | TC_EVSEL_OFF_gc;
+000214 93e0 0803 	STS  2051,R30
+                 ; 0003 0033 
+                 ; 0003 0034 // Set Timer/Counter in Normal mode
+                 ; 0003 0035 TCC0.CTRLE=TC_BYTEM_NORMAL_gc;
+000216 93e0 0804 	STS  2052,R30
+                 ; 0003 0036 
+                 ; 0003 0037 // Overflow interrupt: High Level
+                 ; 0003 0038 // Error interrupt: Disabled
+                 ; 0003 0039 TCC0.INTCTRLA=TC_ERRINTLVL_OFF_gc | TC_OVFINTLVL_HI_gc;
+000218 e0e3      	LDI  R30,LOW(3)
+000219 93e0 0806 	STS  2054,R30
+                 ; 0003 003A 
+                 ; 0003 003B // Compare/Capture channel A interrupt: Disabled
+                 ; 0003 003C // Compare/Capture channel B interrupt: Disabled
+                 ; 0003 003D // Compare/Capture channel C interrupt: Disabled
+                 ; 0003 003E // Compare/Capture channel D interrupt: Disabled
+                 ; 0003 003F TCC0.INTCTRLB=TC_CCDINTLVL_OFF_gc | TC_CCCINTLVL_OFF_gc | TC_CCBINTLVL_OFF_gc | TC_CCAINTLVL_OFF_gc;
+00021b e0e0      	LDI  R30,LOW(0)
+00021c 93e0 0807 	STS  2055,R30
+                 ; 0003 0040 
+                 ; 0003 0041 // High resolution extension: Off
+                 ; 0003 0042 HIRESC.CTRLA&= ~HIRES_HREN0_bm;
+00021e 91e0 0890 	LDS  R30,2192
+000220 7fee      	ANDI R30,0xFE
+000221 93e0 0890 	STS  2192,R30
+                 ; 0003 0043 
+                 ; 0003 0044 // Advanced Waveform Extension initialization
+                 ; 0003 0045 // Optimize for speed
+                 ; 0003 0046 #pragma optsize-
+                 ; 0003 0047 // Disable locking the AWEX configuration registers just to be sure
+                 ; 0003 0048 n=MCU.AWEXLOCK & (~MCU_AWEXCLOCK_bm);
+000223 91e0 0099 	LDS  R30,153
+000225 7fee      	ANDI R30,0xFE
+000226 2f0e      	MOV  R16,R30
+                 ; 0003 0049 CCP=CCP_IOREG_gc;
+000227 ede8      	LDI  R30,LOW(216)
+000228 bfe4      	OUT  0x34,R30
+                 ; 0003 004A MCU.AWEXLOCK=n;
+000229 9300 0099 	STS  153,R16
+                 ; 0003 004B // Restore optimization for size if needed
+                 ; 0003 004C #pragma optsize_default
+                 ; 0003 004D 
+                 ; 0003 004E // Pattern generation: Off
+                 ; 0003 004F // Dead time insertion: Off
+                 ; 0003 0050 AWEXC.CTRL=(0<<AWEX_PGM_bp) | (0<<AWEX_CWCM_bp) | (0<<AWEX_DTICCDEN_bp) | (0<<AWEX_DTICCCEN_bp) |
+                 ; 0003 0051 	(0<<AWEX_DTICCBEN_bp) | (0<<AWEX_DTICCAEN_bp);
 00022b e0e0      	LDI  R30,LOW(0)
-00022c 93e0 0882 	STS  2178,R30
-                 ; 0003 0062 // Make sure the fault detect flag is cleared
-                 ; 0003 0063 AWEXC.STATUS|=AWEXC.STATUS & AWEX_FDF_bm;
-00022e e8a4      	LDI  R26,LOW(2180)
-00022f e0b8      	LDI  R27,HIGH(2180)
-000230 2e0a      	MOV  R0,R26
-000231 91ac      	LD   R26,X
-000232 91e0 0884 	LDS  R30,2180
-000234 70e4      	ANDI R30,LOW(0x4)
-000235 2bea      	OR   R30,R26
-000236 2da0      	MOV  R26,R0
-000237 93ec      	ST   X,R30
-                 ; 0003 0064 
-                 ; 0003 0065 // Clear the interrupt flags
-                 ; 0003 0066 TCC0.INTFLAGS=TCC0.INTFLAGS;
-000238 91e0 080c 	LDS  R30,2060
-00023a 93e0 080c 	STS  2060,R30
-                 ; 0003 0067 // Set Counter register
-                 ; 0003 0068 TCC0.CNT=0x0000;
-00023c e0e0      	LDI  R30,LOW(0)
-00023d e0f0      	LDI  R31,HIGH(0)
-00023e 93e0 0820 	STS  2080,R30
-000240 93f0 0821 	STS  2080+1,R31
-                 ; 0003 0069 // Set Period register
-                 ; 0003 006A TCC0.PER=0x07CF;
-000242 ecef      	LDI  R30,LOW(1999)
-000243 e0f7      	LDI  R31,HIGH(1999)
-000244 93e0 0826 	STS  2086,R30
-000246 93f0 0827 	STS  2086+1,R31
-                 ; 0003 006B // Set channel A Compare/Capture register
-                 ; 0003 006C TCC0.CCA=0x0000;
-000248 e0e0      	LDI  R30,LOW(0)
-000249 e0f0      	LDI  R31,HIGH(0)
-00024a 93e0 0828 	STS  2088,R30
-00024c 93f0 0829 	STS  2088+1,R31
-                 ; 0003 006D // Set channel B Compare/Capture register
-                 ; 0003 006E TCC0.CCB=0x0000;
-00024e 93e0 082a 	STS  2090,R30
-000250 93f0 082b 	STS  2090+1,R31
-                 ; 0003 006F // Set channel C Compare/Capture register
-                 ; 0003 0070 TCC0.CCC=0x0000;
-000252 93e0 082c 	STS  2092,R30
-000254 93f0 082d 	STS  2092+1,R31
-                 ; 0003 0071 // Set channel D Compare/Capture register
-                 ; 0003 0072 TCC0.CCD=0x0000;
-000256 93e0 082e 	STS  2094,R30
-000258 93f0 082f 	STS  2094+1,R31
-                 ; 0003 0073 
-                 ; 0003 0074 // Restore interrupts enabled/disabled state
-                 ; 0003 0075 SREG=s;
-00025a bf1f      	OUT  0x3F,R17
-                 ; 0003 0076 }
+00022c 93e0 0880 	STS  2176,R30
+                 ; 0003 0052 
+                 ; 0003 0053 // Fault protection initialization
+                 ; 0003 0054 // Fault detection on OCD Break detection: On
+                 ; 0003 0055 // Fault detection restart mode: Latched Mode
+                 ; 0003 0056 // Fault detection action: None (Fault protection disabled)
+                 ; 0003 0057 AWEXC.FDCTRL=(AWEXC.FDCTRL & (~(AWEX_FDDBD_bm | AWEX_FDMODE_bm | AWEX_FDACT_gm))) |
+                 ; 0003 0058 	(0<<AWEX_FDDBD_bp) | (0<<AWEX_FDMODE_bp) | AWEX_FDACT_NONE_gc;
+00022e 91e0 0883 	LDS  R30,2179
+000230 7ee8      	ANDI R30,LOW(0xE8)
+000231 93e0 0883 	STS  2179,R30
+                 ; 0003 0059 // Fault detect events:
+                 ; 0003 005A // Event channel 0: Off
+                 ; 0003 005B // Event channel 1: Off
+                 ; 0003 005C // Event channel 2: Off
+                 ; 0003 005D // Event channel 3: Off
+                 ; 0003 005E // Event channel 4: Off
+                 ; 0003 005F // Event channel 5: Off
+                 ; 0003 0060 // Event channel 6: Off
+                 ; 0003 0061 // Event channel 7: Off
+                 ; 0003 0062 AWEXC.FDEMASK=0b00000000;
+000233 e0e0      	LDI  R30,LOW(0)
+000234 93e0 0882 	STS  2178,R30
+                 ; 0003 0063 // Make sure the fault detect flag is cleared
+                 ; 0003 0064 AWEXC.STATUS|=AWEXC.STATUS & AWEX_FDF_bm;
+000236 e8a4      	LDI  R26,LOW(2180)
+000237 e0b8      	LDI  R27,HIGH(2180)
+000238 2e0a      	MOV  R0,R26
+000239 91ac      	LD   R26,X
+00023a 91e0 0884 	LDS  R30,2180
+00023c 70e4      	ANDI R30,LOW(0x4)
+00023d 2bea      	OR   R30,R26
+00023e 2da0      	MOV  R26,R0
+00023f 93ec      	ST   X,R30
+                 ; 0003 0065 
+                 ; 0003 0066 // Clear the interrupt flags
+                 ; 0003 0067 TCC0.INTFLAGS=TCC0.INTFLAGS;
+000240 91e0 080c 	LDS  R30,2060
+000242 93e0 080c 	STS  2060,R30
+                 ; 0003 0068 // Set Counter register
+                 ; 0003 0069 TCC0.CNT=0x0000;
+000244 e0e0      	LDI  R30,LOW(0)
+000245 e0f0      	LDI  R31,HIGH(0)
+000246 93e0 0820 	STS  2080,R30
+000248 93f0 0821 	STS  2080+1,R31
+                 ; 0003 006A // Set Period register
+                 ; 0003 006B TCC0.PER=0x07CF;
+00024a ecef      	LDI  R30,LOW(1999)
+00024b e0f7      	LDI  R31,HIGH(1999)
+00024c 93e0 0826 	STS  2086,R30
+00024e 93f0 0827 	STS  2086+1,R31
+                 ; 0003 006C // Set channel A Compare/Capture register
+                 ; 0003 006D TCC0.CCA=0x0000;
+000250 e0e0      	LDI  R30,LOW(0)
+000251 e0f0      	LDI  R31,HIGH(0)
+000252 93e0 0828 	STS  2088,R30
+000254 93f0 0829 	STS  2088+1,R31
+                 ; 0003 006E // Set channel B Compare/Capture register
+                 ; 0003 006F TCC0.CCB=0x0000;
+000256 93e0 082a 	STS  2090,R30
+000258 93f0 082b 	STS  2090+1,R31
+                 ; 0003 0070 // Set channel C Compare/Capture register
+                 ; 0003 0071 TCC0.CCC=0x0000;
+00025a 93e0 082c 	STS  2092,R30
+00025c 93f0 082d 	STS  2092+1,R31
+                 ; 0003 0072 // Set channel D Compare/Capture register
+                 ; 0003 0073 TCC0.CCD=0x0000;
+00025e 93e0 082e 	STS  2094,R30
+000260 93f0 082f 	STS  2094+1,R31
+                 ; 0003 0074 
+                 ; 0003 0075 // Restore interrupts enabled/disabled state
+                 ; 0003 0076 SREG=s;
+000262 bf1f      	OUT  0x3F,R17
+                 ; 0003 0077 }
                  _0x2060001:
-00025b 9109      	LD   R16,Y+
-00025c 9119      	LD   R17,Y+
-00025d 9508      	RET
+000263 9109      	LD   R16,Y+
+000264 9119      	LD   R17,Y+
+000265 9508      	RET
                  ; .FEND
                  ;
+                 ;static uint32_t msCounter = 0;
                  ;// Timer/Counter TCC0 Overflow/Underflow interrupt service routine
                  ;interrupt [TCC0_OVF_vect] void tcc0_overflow_isr(void)
-                 ; 0003 007A {
+                 ; 0003 007C {
                  _tcc0_overflow_isr:
                  ; .FSTART _tcc0_overflow_isr
-                 ; 0003 007B // Write your code here
-                 ; 0003 007C 
-                 ; 0003 007D }
-00025e 9518      	RETI
+000266 936a      	ST   -Y,R22
+000267 937a      	ST   -Y,R23
+000268 93aa      	ST   -Y,R26
+000269 93ba      	ST   -Y,R27
+00026a 93ea      	ST   -Y,R30
+00026b 93fa      	ST   -Y,R31
+00026c b7ef      	IN   R30,SREG
+00026d 93ea      	ST   -Y,R30
+                 ; 0003 007D // Write your code here
+                 ; 0003 007E 	msCounter++;
+00026e e0a0      	LDI  R26,LOW(_msCounter_G003)
+00026f e2b8      	LDI  R27,HIGH(_msCounter_G003)
+000270 d022      	RCALL __GETD1P_INC
+                +
+000271 5fef     +SUBI R30 , LOW ( - 1 )
+000272 4fff     +SBCI R31 , HIGH ( - 1 )
+000273 4f6f     +SBCI R22 , BYTE3 ( - 1 )
+000274 4f7f     +SBCI R23 , BYTE4 ( - 1 )
+                 	__SUBD1N -1
+000275 d022      	RCALL __PUTDP1_DEC
+                 ; 0003 007F }
+000276 91e9      	LD   R30,Y+
+000277 bfef      	OUT  SREG,R30
+000278 91f9      	LD   R31,Y+
+000279 91e9      	LD   R30,Y+
+00027a 91b9      	LD   R27,Y+
+00027b 91a9      	LD   R26,Y+
+00027c 9179      	LD   R23,Y+
+00027d 9169      	LD   R22,Y+
+00027e 9518      	RETI
                  ; .FEND
                  ;
+                 ;uint32_t getTime(void){
+                 ; 0003 0081 uint32_t getTime(void){
+                 _getTime:
+                 ; .FSTART _getTime
+                 ; 0003 0082 	unsigned char s;
+                 ; 0003 0083 	uint32_t tempValHolder;
+                 ; 0003 0084 
+                 ; 0003 0085 	// Save interrupts enabled/disabled state
+                 ; 0003 0086 	s=SREG;
+00027f 9724      	SBIW R28,4
+000280 931a      	ST   -Y,R17
+                 ;	s -> R17
+                 ;	tempValHolder -> Y+1
+000281 b71f      	IN   R17,63
+                 ; 0003 0087 	// Disable interrupts
+                 ; 0003 0088 	#asm("cli")
+000282 94f8      	CLI
+                 ; 0003 0089 
+                 ; 0003 008A 	//Copy the value with interrupts disabled so the
+                 ; 0003 008B 	//value isn't corrupted by an untimely interrupt
+                 ; 0003 008C 	tempValHolder = msCounter;
+000283 91e0 2800 	LDS  R30,_msCounter_G003
+000285 91f0 2801 	LDS  R31,_msCounter_G003+1
+000287 9160 2802 	LDS  R22,_msCounter_G003+2
+000289 9170 2803 	LDS  R23,_msCounter_G003+3
+                +
+00028b 83e9     +STD Y + 1 , R30
+00028c 83fa     +STD Y + 1 + 1 , R31
+00028d 836b     +STD Y + 1 + 2 , R22
+00028e 837c     +STD Y + 1 + 3 , R23
+                 	__PUTD1S 1
+                 ; 0003 008D 	// Restore interrupts enabled/disabled state
+                 ; 0003 008E 	SREG=s;
+00028f bf1f      	OUT  0x3F,R17
+                 ; 0003 008F 
+                 ; 0003 0090 }
+000290 8118      	LDD  R17,Y+0
+000291 9625      	ADIW R28,5
+000292 9508      	RET
+                 ; .FEND
                  
                  	.CSEG
                  
                  	.CSEG
                  
                  	.CSEG
+                 
+                 	.DSEG
+                 _msCounter_G003:
+002800           	.BYTE 0x4
                  
                  	.CSEG
                  ;RUNTIME LIBRARY
                  
                  	.CSEG
+                 __GETD1P_INC:
+000293 91ed      	LD   R30,X+
+000294 91fd      	LD   R31,X+
+000295 916d      	LD   R22,X+
+000296 917d      	LD   R23,X+
+000297 9508      	RET
+                 
+                 __PUTDP1_DEC:
+000298 937e      	ST   -X,R23
+000299 936e      	ST   -X,R22
+00029a 93fe      	ST   -X,R31
+00029b 93ee      	ST   -X,R30
+00029c 9508      	RET
+                 
                  ;END OF CODE MARKER
                  __END_OF_CODE:
 
@@ -2383,39 +2486,39 @@ counted separately from r26..r31 here.
 ATxmega128B1 register use summary:
 r0 :   2 r1 :   0 r2 :   0 r3 :   0 r4 :   0 r5 :   0 r6 :   0 r7 :   0 
 r8 :   0 r9 :   0 r10:   0 r11:   0 r12:   0 r13:   0 r14:   0 r15:   0 
-r16:   9 r17:  12 r18:   0 r19:   0 r20:   0 r21:   0 r22:   0 r23:   0 
-r24:   3 r25:   1 r26:   9 r27:   3 r28:   1 r29:   1 r30: 215 r31:  14 
-x  :   5 y  :   8 z  :   0 
-Registers used: 13 out of 35 (37.1%)
+r16:   9 r17:  16 r18:   0 r19:   0 r20:   0 r21:   0 r22:   7 r23:   7 
+r24:   3 r25:   1 r26:  12 r27:   6 r28:   3 r29:   1 r30: 229 r31:  22 
+x  :  13 y  :  28 z  :   0 
+Registers used: 15 out of 35 (42.9%)
 
 ATxmega128B1 instruction use summary:
 .lds  :   0 .lds.l:   0 .sts  :   0 .sts.l:   0 adc   :   0 add   :   0 
-adiw  :   1 and   :   0 andi  :  18 asr   :   0 bclr  :   0 bld   :   0 
-brbc  :   0 brbs  :   0 brcc  :   0 brcs  :   0 break :   0 breq  :   1 
+adiw  :   2 and   :   0 andi  :  19 asr   :   0 bclr  :   0 bld   :   0 
+brbc  :   0 brbs  :   0 brcc  :   0 brcs  :   0 break :   0 breq  :   2 
 brge  :   0 brhc  :   0 brhs  :   0 brid  :   0 brie  :   0 brlo  :   0 
 brlt  :   0 brmi  :   0 brne  :   1 brpl  :   0 brsh  :   0 brtc  :   0 
 brts  :   0 brvc  :   0 brvs  :   0 bset  :   0 bst   :   0 call  :   0 
-cbi   :   0 cbr   :   0 clc   :   0 clh   :   0 cli   :   4 cln   :   0 
+cbi   :   0 cbr   :   0 clc   :   0 clh   :   0 cli   :   5 cln   :   0 
 clr   :   1 cls   :   0 clt   :   0 clv   :   0 clz   :   0 com   :   0 
 cp    :   0 cpc   :   0 cpi   :   0 cpse  :   0 dec   :   0 des   :   0 
 eicall:   0 eijmp :   0 elpm  :   0 eor   :   0 fmul  :   0 fmuls :   0 
-fmulsu:   0 icall :   0 ijmp  :   0 in    :   2 inc   :   0 jmp   :  82 
-ld    :   3 ldd   :   0 ldi   :  49 lds   :  21 lpm   :   0 lsl   :   0 
+fmulsu:   0 icall :   0 ijmp  :   0 in    :   4 inc   :   0 jmp   :  82 
+ld    :  14 ldd   :   1 ldi   :  53 lds   :  25 lpm   :   0 lsl   :   0 
 lsr   :   0 mov   :   6 movw  :   1 mul   :   0 muls  :   0 mulsu :   0 
-neg   :   0 nop   :   0 or    :   1 ori   :   3 out   :  14 pop   :   0 
-push  :   0 rcall :   5 ret   :   3 reti  :   1 rjmp  :   4 rol   :   0 
-ror   :   0 sbc   :   0 sbci  :   0 sbi   :   0 sbic  :   0 sbis  :   0 
-sbiw  :   1 sbr   :   0 sbrc  :   0 sbrs  :   0 sec   :   0 seh   :   0 
+neg   :   0 nop   :   0 or    :   1 ori   :   3 out   :  16 pop   :   0 
+push  :   0 rcall :   8 ret   :   6 reti  :   1 rjmp  :   5 rol   :   0 
+ror   :   0 sbc   :   0 sbci  :   3 sbi   :   0 sbic  :   0 sbis  :   0 
+sbiw  :   2 sbr   :   0 sbrc  :   0 sbrs  :   0 sec   :   0 seh   :   0 
 sei   :   1 sen   :   0 ser   :   0 ses   :   0 set   :   0 sev   :   0 
-sez   :   0 sleep :   0 spm   :   0 st    :  10 std   :   0 sts   : 131 
-sub   :   0 subi  :   0 swap  :   0 tst   :   0 wdr   :   0 
-Instructions used: 24 out of 119 (20.2%)
+sez   :   0 sleep :   0 spm   :   0 st    :  22 std   :   4 sts   : 132 
+sub   :   0 subi  :   1 swap  :   0 tst   :   0 wdr   :   0 
+Instructions used: 28 out of 119 (23.5%)
 
 ATxmega128B1 memory use summary [bytes]:
 Segment   Begin    End      Code   Data   Used    Size   Use%
 ---------------------------------------------------------------
-[.cseg] 0x000000 0x0004be   1196     18   1214  139264   0.9%
-[.dseg] 0x002000 0x002800      0      0      0    8192   0.0%
+[.cseg] 0x000000 0x00053a   1320     18   1338  139264   1.0%
+[.dseg] 0x002000 0x002804      0      4      4    8192   0.0%
 [.eseg] 0x000000 0x000000      0      0      0    2048   0.0%
 
 Assembly complete, 0 errors, 0 warnings

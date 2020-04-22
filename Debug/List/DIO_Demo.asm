@@ -1288,6 +1288,7 @@ __CLEAR_SRAM:
 ;Data Stack size         : 2048
 ;*******************************************************/
 ;
+;#include <stdint.h>
 ;// I/O Registers definitions
 ;#include <xmega128b1.h>
 ;
@@ -1306,74 +1307,90 @@ __CLEAR_SRAM:
 ;// Declare your global variables here
 ;
 ;void main(void)
-; 0000 0028 {
+; 0000 0029 {
 
 	.CSEG
 _main:
 ; .FSTART _main
-; 0000 0029 // Declare your local variables here
-; 0000 002A unsigned char n;
-; 0000 002B 
-; 0000 002C // Interrupt system initialization
-; 0000 002D // Optimize for speed
-; 0000 002E #pragma optsize-
-; 0000 002F // Make sure the interrupts are disabled
-; 0000 0030 #asm("cli")
+; 0000 002A // Declare your local variables here
+; 0000 002B unsigned char n;
+; 0000 002C 
+; 0000 002D // Interrupt system initialization
+; 0000 002E // Optimize for speed
+; 0000 002F #pragma optsize-
+; 0000 0030 // Make sure the interrupts are disabled
+; 0000 0031 #asm("cli")
 ;	n -> R17
 	CLI
-; 0000 0031 // Low level interrupt: Off
-; 0000 0032 // Round-robin scheduling for low level interrupt: Off
-; 0000 0033 // Medium level interrupt: Off
-; 0000 0034 // High level interrupt: On
-; 0000 0035 // The interrupt vectors will be placed at the start of the Application FLASH section
-; 0000 0036 n=(PMIC.CTRL & (~(PMIC_RREN_bm | PMIC_IVSEL_bm | PMIC_HILVLEN_bm | PMIC_MEDLVLEN_bm | PMIC_LOLVLEN_bm))) |
-; 0000 0037 	PMIC_HILVLEN_bm;
+; 0000 0032 // Low level interrupt: Off
+; 0000 0033 // Round-robin scheduling for low level interrupt: Off
+; 0000 0034 // Medium level interrupt: Off
+; 0000 0035 // High level interrupt: On
+; 0000 0036 // The interrupt vectors will be placed at the start of the Application FLASH section
+; 0000 0037 n=(PMIC.CTRL & (~(PMIC_RREN_bm | PMIC_IVSEL_bm | PMIC_HILVLEN_bm | PMIC_MEDLVLEN_bm | PMIC_LOLVLEN_bm))) |
+; 0000 0038 	PMIC_HILVLEN_bm;
 	LDS  R30,162
 	ANDI R30,LOW(0x38)
 	ORI  R30,4
 	MOV  R17,R30
-; 0000 0038 CCP=CCP_IOREG_gc;
+; 0000 0039 CCP=CCP_IOREG_gc;
 	LDI  R30,LOW(216)
 	OUT  0x34,R30
-; 0000 0039 PMIC.CTRL=n;
+; 0000 003A PMIC.CTRL=n;
 	STS  162,R17
-; 0000 003A // Set the default priority for round-robin scheduling
-; 0000 003B PMIC.INTPRI=0x00;
+; 0000 003B // Set the default priority for round-robin scheduling
+; 0000 003C PMIC.INTPRI=0x00;
 	LDI  R30,LOW(0)
 	STS  161,R30
-; 0000 003C // Restore optimization for size if needed
-; 0000 003D #pragma optsize_default
-; 0000 003E 
-; 0000 003F // System clocks initialization
-; 0000 0040 system_clocks_init();
+; 0000 003D // Restore optimization for size if needed
+; 0000 003E #pragma optsize_default
+; 0000 003F 
+; 0000 0040 // System clocks initialization
+; 0000 0041 system_clocks_init();
 	RCALL _system_clocks_init
-; 0000 0041 
-; 0000 0042 // Ports initialization
-; 0000 0043 ports_init();
+; 0000 0042 
+; 0000 0043 // Ports initialization
+; 0000 0044 ports_init();
 	RCALL _ports_init
-; 0000 0044 
-; 0000 0045 // Virtual Ports initialization
-; 0000 0046 vports_init();
+; 0000 0045 
+; 0000 0046 // Virtual Ports initialization
+; 0000 0047 vports_init();
 	RCALL _vports_init
-; 0000 0047 
-; 0000 0048 // Timer/Counter TCC0 initialization
-; 0000 0049 tcc0_init();
+; 0000 0048 
+; 0000 0049 // Timer/Counter TCC0 initialization
+; 0000 004A tcc0_init();
 	RCALL _tcc0_init
-; 0000 004A 
-; 0000 004B // Globally enable interrupts
-; 0000 004C #asm("sei")
+; 0000 004B 
+; 0000 004C // Globally enable interrupts
+; 0000 004D #asm("sei")
 	SEI
-; 0000 004D 
-; 0000 004E while (1)
+; 0000 004E 
+; 0000 004F while (1)
 _0x3:
-; 0000 004F       {
-; 0000 0050       // Place your code here
-; 0000 0051 
-; 0000 0052       }
-	RJMP _0x3
-; 0000 0053 }
+; 0000 0050       {
+; 0000 0051       // Place your code here
+; 0000 0052 			if(getTime() & 0x200)
+	RCALL _getTime
+	ANDI R31,HIGH(0x200)
+	BREQ _0x6
+; 0000 0053 			{
+; 0000 0054 				PORTB.OUT=0xF0;
+	LDI  R30,LOW(240)
+	RJMP _0x9
+; 0000 0055 			}
+; 0000 0056 			else
 _0x6:
-	RJMP _0x6
+; 0000 0057 			{
+; 0000 0058 				PORTB.OUT=0x00;
+	LDI  R30,LOW(0)
+_0x9:
+	STS  1572,R30
+; 0000 0059 			}
+; 0000 005A       }
+	RJMP _0x3
+; 0000 005B }
+_0x8:
+	RJMP _0x8
 ; .FEND
 ;/*******************************************************
 ;System clock initialization created by the
@@ -2135,146 +2152,147 @@ _vports_init:
 ;
 ;// I/O Registers definitions
 ;#include <xmega128b1.h>
+;#include <stdint.h>
 ;
 ;// Disable a Timer/Counter type TC0
 ;void tc0_disable(TC0_t *ptc)
-; 0003 000F {
+; 0003 0010 {
 
 	.CSEG
 _tc0_disable:
 ; .FSTART _tc0_disable
-; 0003 0010 // Timer/Counter off
-; 0003 0011 ptc->CTRLA=TC_CLKSEL_OFF_gc;
+; 0003 0011 // Timer/Counter off
+; 0003 0012 ptc->CTRLA=TC_CLKSEL_OFF_gc;
 	ST   -Y,R17
 	ST   -Y,R16
 	MOVW R16,R26
 ;	*ptc -> R16,R17
 	LDI  R30,LOW(0)
 	ST   X,R30
-; 0003 0012 // Issue a reset command
-; 0003 0013 ptc->CTRLFSET=TC_CMD_RESET_gc;
+; 0003 0013 // Issue a reset command
+; 0003 0014 ptc->CTRLFSET=TC_CMD_RESET_gc;
 	ADIW R26,9
 	LDI  R30,LOW(12)
 	ST   X,R30
-; 0003 0014 }
+; 0003 0015 }
 	RJMP _0x2060001
 ; .FEND
 ;
 ;// Timer/Counter TCC0 initialization
 ;void tcc0_init(void)
-; 0003 0018 {
+; 0003 0019 {
 _tcc0_init:
 ; .FSTART _tcc0_init
-; 0003 0019 unsigned char s;
-; 0003 001A unsigned char n;
-; 0003 001B 
-; 0003 001C // Note: The correct PORTC direction for the Compare Channels
-; 0003 001D // outputs is configured in the ports_init function.
-; 0003 001E 
-; 0003 001F // Save interrupts enabled/disabled state
-; 0003 0020 s=SREG;
+; 0003 001A unsigned char s;
+; 0003 001B unsigned char n;
+; 0003 001C 
+; 0003 001D // Note: The correct PORTC direction for the Compare Channels
+; 0003 001E // outputs is configured in the ports_init function.
+; 0003 001F 
+; 0003 0020 // Save interrupts enabled/disabled state
+; 0003 0021 s=SREG;
 	ST   -Y,R17
 	ST   -Y,R16
 ;	s -> R17
 ;	n -> R16
 	IN   R17,63
-; 0003 0021 // Disable interrupts
-; 0003 0022 #asm("cli")
+; 0003 0022 // Disable interrupts
+; 0003 0023 #asm("cli")
 	CLI
-; 0003 0023 
-; 0003 0024 // Disable and reset the timer/counter just to be sure
-; 0003 0025 tc0_disable(&TCC0);
+; 0003 0024 
+; 0003 0025 // Disable and reset the timer/counter just to be sure
+; 0003 0026 tc0_disable(&TCC0);
 	LDI  R26,LOW(2048)
 	LDI  R27,HIGH(2048)
 	RCALL _tc0_disable
-; 0003 0026 // Clock source: ClkPer/1
-; 0003 0027 TCC0.CTRLA=TC_CLKSEL_DIV1_gc;
+; 0003 0027 // Clock source: ClkPer/1
+; 0003 0028 TCC0.CTRLA=TC_CLKSEL_DIV1_gc;
 	LDI  R30,LOW(1)
 	STS  2048,R30
-; 0003 0028 // Mode: Normal Operation, Overflow Int./Event on TOP
-; 0003 0029 // Compare/Capture on channel A: Off
-; 0003 002A // Compare/Capture on channel B: Off
-; 0003 002B // Compare/Capture on channel C: Off
-; 0003 002C // Compare/Capture on channel D: Off
-; 0003 002D TCC0.CTRLB=(0<<TC0_CCDEN_bp) | (0<<TC0_CCCEN_bp) | (0<<TC0_CCBEN_bp) | (0<<TC0_CCAEN_bp) |
-; 0003 002E 	TC_WGMODE_NORMAL_gc;
+; 0003 0029 // Mode: Normal Operation, Overflow Int./Event on TOP
+; 0003 002A // Compare/Capture on channel A: Off
+; 0003 002B // Compare/Capture on channel B: Off
+; 0003 002C // Compare/Capture on channel C: Off
+; 0003 002D // Compare/Capture on channel D: Off
+; 0003 002E TCC0.CTRLB=(0<<TC0_CCDEN_bp) | (0<<TC0_CCCEN_bp) | (0<<TC0_CCBEN_bp) | (0<<TC0_CCAEN_bp) |
+; 0003 002F 	TC_WGMODE_NORMAL_gc;
 	LDI  R30,LOW(0)
 	STS  2049,R30
-; 0003 002F // Capture event source: None
-; 0003 0030 // Capture event action: None
-; 0003 0031 TCC0.CTRLD=TC_EVACT_OFF_gc | TC_EVSEL_OFF_gc;
+; 0003 0030 // Capture event source: None
+; 0003 0031 // Capture event action: None
+; 0003 0032 TCC0.CTRLD=TC_EVACT_OFF_gc | TC_EVSEL_OFF_gc;
 	STS  2051,R30
-; 0003 0032 
-; 0003 0033 // Set Timer/Counter in Normal mode
-; 0003 0034 TCC0.CTRLE=TC_BYTEM_NORMAL_gc;
+; 0003 0033 
+; 0003 0034 // Set Timer/Counter in Normal mode
+; 0003 0035 TCC0.CTRLE=TC_BYTEM_NORMAL_gc;
 	STS  2052,R30
-; 0003 0035 
-; 0003 0036 // Overflow interrupt: High Level
-; 0003 0037 // Error interrupt: Disabled
-; 0003 0038 TCC0.INTCTRLA=TC_ERRINTLVL_OFF_gc | TC_OVFINTLVL_HI_gc;
+; 0003 0036 
+; 0003 0037 // Overflow interrupt: High Level
+; 0003 0038 // Error interrupt: Disabled
+; 0003 0039 TCC0.INTCTRLA=TC_ERRINTLVL_OFF_gc | TC_OVFINTLVL_HI_gc;
 	LDI  R30,LOW(3)
 	STS  2054,R30
-; 0003 0039 
-; 0003 003A // Compare/Capture channel A interrupt: Disabled
-; 0003 003B // Compare/Capture channel B interrupt: Disabled
-; 0003 003C // Compare/Capture channel C interrupt: Disabled
-; 0003 003D // Compare/Capture channel D interrupt: Disabled
-; 0003 003E TCC0.INTCTRLB=TC_CCDINTLVL_OFF_gc | TC_CCCINTLVL_OFF_gc | TC_CCBINTLVL_OFF_gc | TC_CCAINTLVL_OFF_gc;
+; 0003 003A 
+; 0003 003B // Compare/Capture channel A interrupt: Disabled
+; 0003 003C // Compare/Capture channel B interrupt: Disabled
+; 0003 003D // Compare/Capture channel C interrupt: Disabled
+; 0003 003E // Compare/Capture channel D interrupt: Disabled
+; 0003 003F TCC0.INTCTRLB=TC_CCDINTLVL_OFF_gc | TC_CCCINTLVL_OFF_gc | TC_CCBINTLVL_OFF_gc | TC_CCAINTLVL_OFF_gc;
 	LDI  R30,LOW(0)
 	STS  2055,R30
-; 0003 003F 
-; 0003 0040 // High resolution extension: Off
-; 0003 0041 HIRESC.CTRLA&= ~HIRES_HREN0_bm;
+; 0003 0040 
+; 0003 0041 // High resolution extension: Off
+; 0003 0042 HIRESC.CTRLA&= ~HIRES_HREN0_bm;
 	LDS  R30,2192
 	ANDI R30,0xFE
 	STS  2192,R30
-; 0003 0042 
-; 0003 0043 // Advanced Waveform Extension initialization
-; 0003 0044 // Optimize for speed
-; 0003 0045 #pragma optsize-
-; 0003 0046 // Disable locking the AWEX configuration registers just to be sure
-; 0003 0047 n=MCU.AWEXLOCK & (~MCU_AWEXCLOCK_bm);
+; 0003 0043 
+; 0003 0044 // Advanced Waveform Extension initialization
+; 0003 0045 // Optimize for speed
+; 0003 0046 #pragma optsize-
+; 0003 0047 // Disable locking the AWEX configuration registers just to be sure
+; 0003 0048 n=MCU.AWEXLOCK & (~MCU_AWEXCLOCK_bm);
 	LDS  R30,153
 	ANDI R30,0xFE
 	MOV  R16,R30
-; 0003 0048 CCP=CCP_IOREG_gc;
+; 0003 0049 CCP=CCP_IOREG_gc;
 	LDI  R30,LOW(216)
 	OUT  0x34,R30
-; 0003 0049 MCU.AWEXLOCK=n;
+; 0003 004A MCU.AWEXLOCK=n;
 	STS  153,R16
-; 0003 004A // Restore optimization for size if needed
-; 0003 004B #pragma optsize_default
-; 0003 004C 
-; 0003 004D // Pattern generation: Off
-; 0003 004E // Dead time insertion: Off
-; 0003 004F AWEXC.CTRL=(0<<AWEX_PGM_bp) | (0<<AWEX_CWCM_bp) | (0<<AWEX_DTICCDEN_bp) | (0<<AWEX_DTICCCEN_bp) |
-; 0003 0050 	(0<<AWEX_DTICCBEN_bp) | (0<<AWEX_DTICCAEN_bp);
+; 0003 004B // Restore optimization for size if needed
+; 0003 004C #pragma optsize_default
+; 0003 004D 
+; 0003 004E // Pattern generation: Off
+; 0003 004F // Dead time insertion: Off
+; 0003 0050 AWEXC.CTRL=(0<<AWEX_PGM_bp) | (0<<AWEX_CWCM_bp) | (0<<AWEX_DTICCDEN_bp) | (0<<AWEX_DTICCCEN_bp) |
+; 0003 0051 	(0<<AWEX_DTICCBEN_bp) | (0<<AWEX_DTICCAEN_bp);
 	LDI  R30,LOW(0)
 	STS  2176,R30
-; 0003 0051 
-; 0003 0052 // Fault protection initialization
-; 0003 0053 // Fault detection on OCD Break detection: On
-; 0003 0054 // Fault detection restart mode: Latched Mode
-; 0003 0055 // Fault detection action: None (Fault protection disabled)
-; 0003 0056 AWEXC.FDCTRL=(AWEXC.FDCTRL & (~(AWEX_FDDBD_bm | AWEX_FDMODE_bm | AWEX_FDACT_gm))) |
-; 0003 0057 	(0<<AWEX_FDDBD_bp) | (0<<AWEX_FDMODE_bp) | AWEX_FDACT_NONE_gc;
+; 0003 0052 
+; 0003 0053 // Fault protection initialization
+; 0003 0054 // Fault detection on OCD Break detection: On
+; 0003 0055 // Fault detection restart mode: Latched Mode
+; 0003 0056 // Fault detection action: None (Fault protection disabled)
+; 0003 0057 AWEXC.FDCTRL=(AWEXC.FDCTRL & (~(AWEX_FDDBD_bm | AWEX_FDMODE_bm | AWEX_FDACT_gm))) |
+; 0003 0058 	(0<<AWEX_FDDBD_bp) | (0<<AWEX_FDMODE_bp) | AWEX_FDACT_NONE_gc;
 	LDS  R30,2179
 	ANDI R30,LOW(0xE8)
 	STS  2179,R30
-; 0003 0058 // Fault detect events:
-; 0003 0059 // Event channel 0: Off
-; 0003 005A // Event channel 1: Off
-; 0003 005B // Event channel 2: Off
-; 0003 005C // Event channel 3: Off
-; 0003 005D // Event channel 4: Off
-; 0003 005E // Event channel 5: Off
-; 0003 005F // Event channel 6: Off
-; 0003 0060 // Event channel 7: Off
-; 0003 0061 AWEXC.FDEMASK=0b00000000;
+; 0003 0059 // Fault detect events:
+; 0003 005A // Event channel 0: Off
+; 0003 005B // Event channel 1: Off
+; 0003 005C // Event channel 2: Off
+; 0003 005D // Event channel 3: Off
+; 0003 005E // Event channel 4: Off
+; 0003 005F // Event channel 5: Off
+; 0003 0060 // Event channel 6: Off
+; 0003 0061 // Event channel 7: Off
+; 0003 0062 AWEXC.FDEMASK=0b00000000;
 	LDI  R30,LOW(0)
 	STS  2178,R30
-; 0003 0062 // Make sure the fault detect flag is cleared
-; 0003 0063 AWEXC.STATUS|=AWEXC.STATUS & AWEX_FDF_bm;
+; 0003 0063 // Make sure the fault detect flag is cleared
+; 0003 0064 AWEXC.STATUS|=AWEXC.STATUS & AWEX_FDF_bm;
 	LDI  R26,LOW(2180)
 	LDI  R27,HIGH(2180)
 	MOV  R0,R26
@@ -2284,73 +2302,148 @@ _tcc0_init:
 	OR   R30,R26
 	MOV  R26,R0
 	ST   X,R30
-; 0003 0064 
-; 0003 0065 // Clear the interrupt flags
-; 0003 0066 TCC0.INTFLAGS=TCC0.INTFLAGS;
+; 0003 0065 
+; 0003 0066 // Clear the interrupt flags
+; 0003 0067 TCC0.INTFLAGS=TCC0.INTFLAGS;
 	LDS  R30,2060
 	STS  2060,R30
-; 0003 0067 // Set Counter register
-; 0003 0068 TCC0.CNT=0x0000;
+; 0003 0068 // Set Counter register
+; 0003 0069 TCC0.CNT=0x0000;
 	LDI  R30,LOW(0)
 	LDI  R31,HIGH(0)
 	STS  2080,R30
 	STS  2080+1,R31
-; 0003 0069 // Set Period register
-; 0003 006A TCC0.PER=0x07CF;
+; 0003 006A // Set Period register
+; 0003 006B TCC0.PER=0x07CF;
 	LDI  R30,LOW(1999)
 	LDI  R31,HIGH(1999)
 	STS  2086,R30
 	STS  2086+1,R31
-; 0003 006B // Set channel A Compare/Capture register
-; 0003 006C TCC0.CCA=0x0000;
+; 0003 006C // Set channel A Compare/Capture register
+; 0003 006D TCC0.CCA=0x0000;
 	LDI  R30,LOW(0)
 	LDI  R31,HIGH(0)
 	STS  2088,R30
 	STS  2088+1,R31
-; 0003 006D // Set channel B Compare/Capture register
-; 0003 006E TCC0.CCB=0x0000;
+; 0003 006E // Set channel B Compare/Capture register
+; 0003 006F TCC0.CCB=0x0000;
 	STS  2090,R30
 	STS  2090+1,R31
-; 0003 006F // Set channel C Compare/Capture register
-; 0003 0070 TCC0.CCC=0x0000;
+; 0003 0070 // Set channel C Compare/Capture register
+; 0003 0071 TCC0.CCC=0x0000;
 	STS  2092,R30
 	STS  2092+1,R31
-; 0003 0071 // Set channel D Compare/Capture register
-; 0003 0072 TCC0.CCD=0x0000;
+; 0003 0072 // Set channel D Compare/Capture register
+; 0003 0073 TCC0.CCD=0x0000;
 	STS  2094,R30
 	STS  2094+1,R31
-; 0003 0073 
-; 0003 0074 // Restore interrupts enabled/disabled state
-; 0003 0075 SREG=s;
+; 0003 0074 
+; 0003 0075 // Restore interrupts enabled/disabled state
+; 0003 0076 SREG=s;
 	OUT  0x3F,R17
-; 0003 0076 }
+; 0003 0077 }
 _0x2060001:
 	LD   R16,Y+
 	LD   R17,Y+
 	RET
 ; .FEND
 ;
+;static uint32_t msCounter = 0;
 ;// Timer/Counter TCC0 Overflow/Underflow interrupt service routine
 ;interrupt [TCC0_OVF_vect] void tcc0_overflow_isr(void)
-; 0003 007A {
+; 0003 007C {
 _tcc0_overflow_isr:
 ; .FSTART _tcc0_overflow_isr
-; 0003 007B // Write your code here
-; 0003 007C 
-; 0003 007D }
+	ST   -Y,R22
+	ST   -Y,R23
+	ST   -Y,R26
+	ST   -Y,R27
+	ST   -Y,R30
+	ST   -Y,R31
+	IN   R30,SREG
+	ST   -Y,R30
+; 0003 007D // Write your code here
+; 0003 007E 	msCounter++;
+	LDI  R26,LOW(_msCounter_G003)
+	LDI  R27,HIGH(_msCounter_G003)
+	RCALL __GETD1P_INC
+	__SUBD1N -1
+	RCALL __PUTDP1_DEC
+; 0003 007F }
+	LD   R30,Y+
+	OUT  SREG,R30
+	LD   R31,Y+
+	LD   R30,Y+
+	LD   R27,Y+
+	LD   R26,Y+
+	LD   R23,Y+
+	LD   R22,Y+
 	RETI
 ; .FEND
 ;
+;uint32_t getTime(void){
+; 0003 0081 uint32_t getTime(void){
+_getTime:
+; .FSTART _getTime
+; 0003 0082 	unsigned char s;
+; 0003 0083 	uint32_t tempValHolder;
+; 0003 0084 
+; 0003 0085 	// Save interrupts enabled/disabled state
+; 0003 0086 	s=SREG;
+	SBIW R28,4
+	ST   -Y,R17
+;	s -> R17
+;	tempValHolder -> Y+1
+	IN   R17,63
+; 0003 0087 	// Disable interrupts
+; 0003 0088 	#asm("cli")
+	CLI
+; 0003 0089 
+; 0003 008A 	//Copy the value with interrupts disabled so the
+; 0003 008B 	//value isn't corrupted by an untimely interrupt
+; 0003 008C 	tempValHolder = msCounter;
+	LDS  R30,_msCounter_G003
+	LDS  R31,_msCounter_G003+1
+	LDS  R22,_msCounter_G003+2
+	LDS  R23,_msCounter_G003+3
+	__PUTD1S 1
+; 0003 008D 	// Restore interrupts enabled/disabled state
+; 0003 008E 	SREG=s;
+	OUT  0x3F,R17
+; 0003 008F 
+; 0003 0090 }
+	LDD  R17,Y+0
+	ADIW R28,5
+	RET
+; .FEND
 
 	.CSEG
 
 	.CSEG
 
 	.CSEG
+
+	.DSEG
+_msCounter_G003:
+	.BYTE 0x4
 
 	.CSEG
 ;RUNTIME LIBRARY
 
 	.CSEG
+__GETD1P_INC:
+	LD   R30,X+
+	LD   R31,X+
+	LD   R22,X+
+	LD   R23,X+
+	RET
+
+__PUTDP1_DEC:
+	ST   -X,R23
+	ST   -X,R22
+	ST   -X,R31
+	ST   -X,R30
+	RET
+
 ;END OF CODE MARKER
 __END_OF_CODE:

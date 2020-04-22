@@ -1,6 +1,7 @@
 RAM Allocation [bytes]
 Variable                                                                          Address   Size
 ------------------------------------------------------------------------------------------------
+msCounter (timers_init.c)                                                         0x2800       4
 
 EEPROM Allocation [bytes]
 Variable                                                                          Address   Size
@@ -13,10 +14,11 @@ Variable                                                                        
 FLASH Allocation [words]
 Function                                                                          Address   Size
 ------------------------------------------------------------------------------------------------
-main                                                                              0x000CB     20
-system_clocks_init                                                                0x000DF     44
-ports_init                                                                        0x0010B    228
-vports_init                                                                       0x001EF      7
-tc0_disable                                                                       0x001F6      9
-tcc0_init                                                                         0x001FF     95
-tcc0_overflow_isr                                                                 0x0025E      1
+main                                                                              0x000CB     28
+system_clocks_init                                                                0x000E7     44
+ports_init                                                                        0x00113    228
+vports_init                                                                       0x001F7      7
+tc0_disable                                                                       0x001FE      9
+tcc0_init                                                                         0x00207     95
+tcc0_overflow_isr                                                                 0x00266     25
+getTime                                                                           0x0027F     20

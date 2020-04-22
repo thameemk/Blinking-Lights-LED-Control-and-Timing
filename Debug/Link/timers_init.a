@@ -206,9 +206,55 @@
 ;PCODE: $00000051 VOL: 0
 ;PCODE: $00000052 VOL: 0
 ;
-;static unit32_t msCounter = 0;
-; 0003 0079 static unit32_t msCounter = 0;
+;static uint32_t msCounter = 0;
+;// Timer/Counter TCC0 Overflow/Underflow interrupt service routine
+;interrupt [TCC0_OVF_vect] void tcc0_overflow_isr(void)
+; 0003 007C {
 ;PCODE: $00000053 VOL: 0
 ;PCODE: $00000054 VOL: 0
+; 0003 007D // Write your code here
+; 0003 007E 	msCounter++;
 ;PCODE: $00000055 VOL: 0
 ;PCODE: $00000056 VOL: 0
+;PCODE: $00000057 VOL: 0
+;PCODE: $00000058 VOL: 0
+; 0003 007F }
+;PCODE: $00000059 VOL: 0
+;PCODE: $0000005A VOL: 0
+;PCODE: $0000005B VOL: 0
+;
+;uint32_t getTime(void){
+; 0003 0081 uint32_t getTime(void){
+;PCODE: $0000005C VOL: 0
+;PCODE: $0000005D VOL: 0
+; 0003 0082 	unsigned char s;
+; 0003 0083 	uint32_t tempValHolder;
+; 0003 0084 
+; 0003 0085 	// Save interrupts enabled/disabled state
+; 0003 0086 	s=SREG;
+;PCODE: $0000005E VOL: 0
+;PCODE: $0000005F VOL: 0
+;	s -> R17
+;	tempValHolder -> Y+1
+;PCODE: $00000060 VOL: 0
+;PCODE: $00000061 VOL: 0
+; 0003 0087 	// Disable interrupts
+; 0003 0088 	#asm("cli")
+;PCODE: $00000062 VOL: 0
+; 0003 0089 
+; 0003 008A 	//Copy the value with interrupts disabled so the
+; 0003 008B 	//value isn't corrupted by an untimely interrupt
+; 0003 008C 	tempValHolder = msCounter;
+;PCODE: $00000063 VOL: 0
+;PCODE: $00000064 VOL: 0
+; 0003 008D 	// Restore interrupts enabled/disabled state
+; 0003 008E 	SREG=s;
+;PCODE: $00000065 VOL: 0
+;PCODE: $00000066 VOL: 0
+; 0003 008F 
+; 0003 0090 }
+;PCODE: $00000067 VOL: 0
+;PCODE: $00000068 VOL: 0
+;PCODE: $00000069 VOL: 0
+;PCODE: $0000006A VOL: 0
+;PCODE: $0000006B VOL: 0
